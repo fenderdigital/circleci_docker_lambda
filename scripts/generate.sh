@@ -23,7 +23,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
 
     for NODE_VERSION in $NODE_VERSIONS_NUM
     do
-      echo "RUN source $NVM_DIR/nvm.sh && nvm install $NODE_VERSION"
+      echo "RUN . $NVM_DIR/nvm.sh && nvm install $NODE_VERSION"
     done
 fi
 
