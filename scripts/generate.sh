@@ -19,10 +19,11 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
 
     #Install nvm
     echo "RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash"
+    ENV NVM_DIR $HOME/.nvm
 
     for NODE_VERSION in $NODE_VERSIONS_NUM
     do
-      echo "RUN nvm install $NODE_VERSION"
+      echo "RUN source $NVM_DIR/nvm.sh && nvm install $NODE_VERSION"
     done
 fi
 
