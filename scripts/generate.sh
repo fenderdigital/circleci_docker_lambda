@@ -14,16 +14,15 @@ if [ ! -e $RUBY_VERSION_NUM ] ; then
     ruby -v"
 fi
 
-if [ ! -e $NODE_VERSION_NUM ] ; then
-    echo "RUN wget https://nodejs.org/dist/v$NODE_VERSION_NUM/node-v$NODE_VERSION_NUM.tar.gz && \
-    tar -xzvf node-v$NODE_VERSION_NUM.tar.gz && \
-    rm node-v$NODE_VERSION_NUM.tar.gz && \
-    cd node-v$NODE_VERSION_NUM && \
-    ./configure && \
-    make -j4 && \
-    make install && \
-    cd .. && \
-    rm -r node-v$NODE_VERSION_NUM"
+if [ ! -e $NODE_VERSIONS_NUM ] ; then
+    #Install nvm
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+
+    for NODE_VERSION in $NODE_VERSION_NUM
+    do
+      echo "Installing Node Version ${NODE_VERSION}"
+      nvm install $NODE_VERSION
+    done
 fi
 
 if [ ! -e $PYTHON_VERSION_NUM ] ; then
