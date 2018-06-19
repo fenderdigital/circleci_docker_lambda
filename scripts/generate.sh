@@ -14,7 +14,7 @@ if [ ! -e $RUBY_VERSION_NUM ] ; then
     ruby -v"
 fi
 
-if [ ! -e $NODE_VERSIONS_NUM ] ; then
+if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     #Install nvm
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 
