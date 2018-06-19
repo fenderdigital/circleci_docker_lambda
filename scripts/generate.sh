@@ -17,9 +17,9 @@ fi
 if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     apt-get update && apt-get -y install build-essential
 
-    echo "ENV NVM_DIR /root/.nvm"
     #Install nvm
     echo "RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash"
+    echo "ENV NVM_DIR /root/.nvm"
 
     for NODE_VERSION in $NODE_VERSIONS_NUM
     do
