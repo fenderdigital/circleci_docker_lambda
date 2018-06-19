@@ -54,7 +54,7 @@ jobs:
 
   test_image:
     docker:
-      - image: $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+      - image: $DOCKER_USERNAME/circleci:node
         environment:
           <<: *image_config
 
