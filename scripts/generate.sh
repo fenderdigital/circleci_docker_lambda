@@ -18,7 +18,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     #Install nvm
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 
-    for NODE_VERSION in $NODE_VERSION_NUM
+    for NODE_VERSION in $NODE_VERSIONS_NUM
     do
       echo "Installing Node Version ${NODE_VERSION}"
       nvm install $NODE_VERSION
