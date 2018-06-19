@@ -4,7 +4,7 @@ image_config: &image_config
   # either as project-specific environment variables
   # or as resources in your organization's org-global Context
 
-  IMAGE_NAME: opsfender
+  IMAGE_NAME: circleci
 
   IMAGE_TAG: node
 
@@ -54,7 +54,7 @@ jobs:
 
   test_image:
     docker:
-      - image: $DOCKER_USERNAME/circleci:node
+      - image: $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG
         environment:
           <<: *image_config
 
