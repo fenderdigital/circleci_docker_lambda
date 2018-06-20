@@ -16,7 +16,7 @@ fi
 
 if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     echo "RUN apt-get update && \
-      apt-get -y install build-essential libappindicator1 libnss3
+      apt-get -y install build-essential libappindicator1 libnss3"
 
     #Install nvm
     echo "RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash"
