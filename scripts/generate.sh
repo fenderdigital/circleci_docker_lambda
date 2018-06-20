@@ -15,7 +15,7 @@ if [ ! -e $RUBY_VERSION_NUM ] ; then
 fi
 
 if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
-    echo "RUN apt-get install apt-transport-https ca-certificates && \
+    echo "RUN apt-get -y install apt-transport-https ca-certificates && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
     echo 'deb https://dl.yarnpkg.com/debian/ stable main' | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && \
