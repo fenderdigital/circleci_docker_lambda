@@ -15,6 +15,7 @@ if [ ! -e $RUBY_VERSION_NUM ] ; then
 fi
 
 if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
+    echo "RUN deb https://dl.yarnpkg.com/debian/ stable main' | tee /etc/apt/sources.list.d/yarn.list"
     echo "RUN apt-get update && \
       apt-get -y install build-essential libappindicator1 libnss3 yarn"
 
@@ -137,7 +138,6 @@ fi
 
 # FENDER
 echo "RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg |  apt-key add - && \\ 
-echo 'deb https://dl.yarnpkg.com/debian/ stable main' | tee /etc/apt/sources.list.d/yarn.list && \\
 apt-get update && \\
 python -m ensurepip --default-pip && \\
 pip install awscli \\
