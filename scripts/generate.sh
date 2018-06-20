@@ -142,8 +142,7 @@ fi
 echo "RUN apt-get update && \\
 python -m ensurepip --default-pip && \\
 pip install awscli \\
-"
-#curl -L -o google-chrome.deb https://s3.amazonaws.com/circle-downloads/google-chrome-stable_current_amd64_47.0.2526.73-1.deb && \\
-#dpkg --force-depends -i google-chrome.deb || apt-get install -f -y && dpkg --force-depends -i google-chrome.deb && \\
-#sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome && \\
-#rm google-chrome.deb"
+curl -L -o google-chrome.deb https://s3.amazonaws.com/circle-downloads/google-chrome-stable_current_amd64_47.0.2526.73-1.deb && \\
+dpkg --force-depends -i google-chrome.deb || apt-get install -f -y && dpkg --force-depends -i google-chrome.deb && \\
+sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome && \\
+rm google-chrome.deb"
