@@ -15,9 +15,10 @@ if [ ! -e $RUBY_VERSION_NUM ] ; then
 fi
 
 if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
+    echo "RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -"
     echo "RUN echo 'deb https://dl.yarnpkg.com/debian/ stable main' | tee /etc/apt/sources.list.d/yarn.list"
     echo "RUN apt-get update && \
-      apt-get -y install build-essential libappindicator1 libnss3 yarn"
+      apt-get -y apt-transport-https ca-certificates install build-essential libappindicator1 libnss3 yarn"
 
     #Install nvm
     echo "RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash"
@@ -137,8 +138,7 @@ RUN apt-get -y install libgconf-2-4 \
 fi
 
 # FENDER
-echo "RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg |  apt-key add - && \\ 
-apt-get update && \\
+echo "RUN apt-get update && \\
 python -m ensurepip --default-pip && \\
 pip install awscli \\
 "
