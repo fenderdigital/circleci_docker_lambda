@@ -19,7 +19,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
     echo 'deb https://dl.yarnpkg.com/debian/ stable main' | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && \
-    apt-get -y install build-essential libappindicator1 libnss3"
+    apt-get -y install build-essential libappindicator1 libnss3 yarn"
 
     #Install nvm
     echo "RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash"
