@@ -117,7 +117,7 @@ su -c '/usr/lib/postgresql/9.5/bin/initdb -D /usr/local/pgsql/data' postgres"
 echo "RUN git clone https://github.com/pyenv/pyenv.git /opt/.pyenv"
 echo "ENV PYENV_ROOT \"/opt/.pyenv\""
 echo "ENV PATH \"/opt/.pyenv/bin/:$PATH\""
-echo "RUN pyenv install 3.7.0 && eval \"\$(pyenv init -)\""
+echo "RUN pyenv install 3.7.0"
 ## END Fender-dub-specific items ##
 
 # if [ ! -e $PHP_VERSION_NUM ] ; then
