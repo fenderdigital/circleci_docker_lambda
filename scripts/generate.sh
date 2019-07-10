@@ -78,8 +78,8 @@ RUN export AWS_ACCESS_KEY_ID=$FENDER_CCI_IAM_SANDBOX_KEY_ID AWS_SECRET_ACCESS_KE
     aws s3 cp s3://fdp-codedeploy-sandbox-use1/java/jre/jre-8u211-linux-x64.tar.gz . && \\
     tar zxvf jre-8u211-linux-x64.tar.gz && \\
     rm jre-8u211-linux-x64.tar.gz && \\
-    sudo mv jre1.8.0_211/ /usr/local/ && \\
-    sudo ln -s /usr/local/jre1.8.0_211/bin/java /usr/local/bin/java
+    mv jre1.8.0_211/ /usr/local/ && \\
+    ln -s /usr/local/jre1.8.0_211/bin/java /usr/local/bin/java
 EOF
 fi
 
