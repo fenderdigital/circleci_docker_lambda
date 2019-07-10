@@ -47,17 +47,33 @@ RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
     apt-get --force-yes -y install software-properties-common python-software-properties && \\
     echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
     echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
-    cd /var/tmp/ && \\
-    wget -O oracle_java8.deb debian.opennms.org/dists/opennms-23/main/binary-all/oracle-java8-installer_8u131-1~webupd8~2_all.deb && \\
-    dpkg -i oracle_java8.deb || echo "ok" && apt-get -f install -yq \\
+
+    # Install Java
+    pushd /var/tmp
+    aws s3 cp s3://fdp-codedeploy-sandbox-use1/java/jre/jre-8u211-linux-x64.tar.gz .
+    tar zxvf jre-8u211-linux-x64.tar.gz
+    rm jre-8u211-linux-x64.tar.gz
+    sudo mv jre1.8.0_211/ /usr/local/
+    sudo ln -s /usr/local/jre1.8.0_211/bin/java /usr/local/bin/java
+    export PATH=`echo $PATH | sed -e 's/:\/usr\/local\/openjdk-8\/bin//'`
+    popd
+
 ; elif [ \$(grep 'VERSION_ID="16.04"' /etc/os-release) ] ; then \\
     apt-get update && \\
     apt-get --force-yes -y install software-properties-common python-software-properties && \\
     echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
     echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
-    cd /var/tmp/ && \\
-    wget -O oracle_java8.deb debian.opennms.org/dists/opennms-23/main/binary-all/oracle-java8-installer_8u131-1~webupd8~2_all.deb && \\
-    dpkg -i oracle_java8.deb || echo "ok" && apt-get -f install -yq \\
+
+    # Install Java
+    pushd /var/tmp
+    aws s3 cp s3://fdp-codedeploy-sandbox-use1/java/jre/jre-8u211-linux-x64.tar.gz .
+    tar zxvf jre-8u211-linux-x64.tar.gz
+    rm jre-8u211-linux-x64.tar.gz
+    sudo mv jre1.8.0_211/ /usr/local/
+    sudo ln -s /usr/local/jre1.8.0_211/bin/java /usr/local/bin/java
+    export PATH=`echo $PATH | sed -e 's/:\/usr\/local\/openjdk-8\/bin//'`
+    popd
+
 ; fi
 EOF
 fi
