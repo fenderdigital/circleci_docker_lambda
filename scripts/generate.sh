@@ -46,7 +46,7 @@ RUN apt-get update && \\
     tar zxvf jre-8u211-linux-x64.tar.gz && \\
     rm jre-8u211-linux-x64.tar.gz && \\
     sudo mv jre1.8.0_211/ /usr/local/ && \\
-    sudo ln -s /usr/local/jre1.8.0_211/bin/java /usr/local/bin/java &&
+    sudo ln -s /usr/local/jre1.8.0_211/bin/java /usr/local/bin/java
 EOF
 fi
 
