@@ -35,21 +35,6 @@ if [ ! -e $PYTHON_VERSION_NUM ] ; then
     make install"
 fi
 
-if [ $JAVA = "true" ] ; then
-cat << EOF
-RUN apt-get update && \\
-    apt-get --force-yes -y install software-properties-common python-software-properties && \\
-    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
-    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
-    cd /var/tmp && \\
-    aws s3 cp s3://fdp-codedeploy-sandbox-use1/java/jre/jre-8u211-linux-x64.tar.gz . && \\
-    tar zxvf jre-8u211-linux-x64.tar.gz && \\
-    rm jre-8u211-linux-x64.tar.gz && \\
-    sudo mv jre1.8.0_211/ /usr/local/ && \\
-    sudo ln -s /usr/local/jre1.8.0_211/bin/java /usr/local/bin/java
-EOF
-fi
-
 ## Fender-specific items ##
 
 echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget"
@@ -80,6 +65,22 @@ echo "RUN apt-get install -y python2.7 && \
 update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && \
 apt-get -y install python-simplejson python-minimal aptitude python-pip python-dev && \
 pip install google_compute_engine boto boto3 botocore six awscli 'ansible==2.6.2'"
+
+# Install Java
+if [ $JAVA = "true" ] ; then
+cat << EOF
+RUN apt-get update && \\
+    apt-get --force-yes -y install software-properties-common python-software-properties && \\
+    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
+    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
+    cd /var/tmp && \\
+    aws s3 cp s3://fdp-codedeploy-sandbox-use1/java/jre/jre-8u211-linux-x64.tar.gz . && \\
+    tar zxvf jre-8u211-linux-x64.tar.gz && \\
+    rm jre-8u211-linux-x64.tar.gz && \\
+    sudo mv jre1.8.0_211/ /usr/local/ && \\
+    sudo ln -s /usr/local/jre1.8.0_211/bin/java /usr/local/bin/java
+EOF
+fi
 
 # Install local DynamoDB
 echo "RUN mkdir /root/DynamoDBLocal && \
