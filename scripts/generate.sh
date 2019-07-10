@@ -69,7 +69,8 @@ pip install google_compute_engine boto boto3 botocore six awscli 'ansible==2.6.2
 # Install Java
 if [ $JAVA = "true" ] ; then
 cat << EOF
-RUN apt-get update && \\
+RUN export AWS_ACCESS_KEY_ID=$FENDER_CCI_IAM_SANDBOX_KEY_ID AWS_SECRET_ACCESS_KEY=$FENDER_CCI_IAM_SANDBOX_SECRET_KEY && \\
+    apt-get update && \\
     apt-get --force-yes -y install software-properties-common python-software-properties && \\
     echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
     echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
