@@ -35,6 +35,33 @@ if [ ! -e $PYTHON_VERSION_NUM ] ; then
     make install"
 fi
 
+if [ $JAVA = "true" ] ; then
+cat << EOF
+RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
+    echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \\
+    apt-get update && apt-get -y install -t jessie-backports openjdk-8-jdk ca-certificates-java \\
+; elif [ \$(grep 'VERSION_ID="9"' /etc/os-release) ] ; then \\
+    apt-get update && apt-get -y -q --no-install-recommends install -t stable openjdk-8-jdk ca-certificates-java \\
+; elif [ \$(grep 'VERSION_ID="14.04"' /etc/os-release) ] ; then \\
+    apt-get update && \\
+    apt-get --force-yes -y install software-properties-common python-software-properties && \\
+    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
+    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
+    cd /var/tmp/ && \\
+    wget -O oracle_java8.deb debian.opennms.org/dists/opennms-23/main/binary-all/oracle-java8-installer_8u131-1~webupd8~2_all.deb && \\
+    dpkg -i oracle_java8.deb || echo "ok" && apt-get -f install -yq \\
+; elif [ \$(grep 'VERSION_ID="16.04"' /etc/os-release) ] ; then \\
+    apt-get update && \\
+    apt-get --force-yes -y install software-properties-common python-software-properties && \\
+    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
+    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
+    cd /var/tmp/ && \\
+    wget -O oracle_java8.deb debian.opennms.org/dists/opennms-23/main/binary-all/oracle-java8-installer_8u131-1~webupd8~2_all.deb && \\
+    dpkg -i oracle_java8.deb || echo "ok" && apt-get -f install -yq \\
+; fi
+EOF
+fi
+
 ## Fender-specific items ##
 
 echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget vim less htop"
@@ -65,23 +92,6 @@ echo "RUN apt-get install -y python2.7 && \
 update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && \
 apt-get -y install python-simplejson python-minimal aptitude python-pip python-dev && \
 pip install google_compute_engine boto boto3 botocore six awscli 'ansible==2.6.2' 'PyYAML==3.12'"
-
-# Install Java
-if [ $JAVA = "true" ] ; then
-cat << EOF
-RUN export AWS_ACCESS_KEY_ID=$FENDER_CCI_IAM_SANDBOX_KEY_ID AWS_SECRET_ACCESS_KEY=$FENDER_CCI_IAM_SANDBOX_SECRET_KEY && \\
-    apt-get update && \\
-    apt-get --force-yes -y install software-properties-common python-software-properties && \\
-    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
-    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
-    cd /var/tmp && \\
-    aws s3 cp s3://fdp-codedeploy-sandbox-use1/java/jre/jre-8u211-linux-x64.tar.gz . && \\
-    tar zxvf jre-8u211-linux-x64.tar.gz && \\
-    rm jre-8u211-linux-x64.tar.gz && \\
-    mv jre1.8.0_211/ /usr/local/ && \\
-    ln -s /usr/local/jre1.8.0_211/bin/java /usr/local/bin/java
-EOF
-fi
 
 # Install local DynamoDB
 echo "RUN mkdir /root/DynamoDBLocal && \
