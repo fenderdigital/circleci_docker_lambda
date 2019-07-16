@@ -99,8 +99,7 @@ wget https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar
 tar -xvf /root/DynamoDBLocal/dynamodb_local_latest.tar.gz -C /root/DynamoDBLocal/"
 
 # Install local Elasticsearch
-echo "RUN ls -lah /usr/local/bin && ls -lah /usr/local/bin/java && echo $PATH && \
-wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
+echo "RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
 apt-get -y install apt-transport-https && \
 echo 'deb https://artifacts.elastic.co/packages/5.x/apt stable main' | tee -a /etc/apt/sources.list.d/elastic-5.x.list && \
 apt-get update && apt-get -y install elasticsearch=5.5.3 && \
