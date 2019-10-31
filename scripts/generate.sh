@@ -88,10 +88,14 @@ export PATH=\"/root/.tfenv/bin:$PATH\" && \
 tfenv install latest:^0.11"
 
 # Install Ansible
-echo "RUN apt-get install -y python2.7 && \
-update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && \
-apt-get -y install python-simplejson python-minimal aptitude python-pip python-dev && \
-pip install google_compute_engine boto boto3 botocore six awscli 'ansible==2.6.2' 'PyYAML==3.12'"
+echo "RUN \
+apt-get install -y python3-simplejson python3.5-minimal python3-dev aptitude libffi-dev && \
+cd /usr/local/bin && \
+ln -s /usr/bin/python3.5 python && \
+cd - && \
+(curl -sS https://bootstrap.pypa.io/get-pip.py | sudo python3.5) && \
+pip3.5  install "PyYAML==3.12"  --ignore-installed && \
+pip3.5 install google_compute_engine awscli boto boto3 botocore six 'cryptography>=2.5' 'ansible==2.8.6'"
 
 # Install local DynamoDB
 echo "RUN mkdir /root/DynamoDBLocal && \
