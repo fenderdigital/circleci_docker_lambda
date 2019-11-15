@@ -65,10 +65,11 @@ echo "RUN apt-get install -y software-properties-common python-software-properti
 echo "ENV PYENV_ROOT /opt/.pyenv"
 echo "ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH"
 echo "RUN curl -fsSL https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash"
-echo "RUN echo 'export PYENV_ROOT="/opt/.pyenv"'         >> ~/.bashrc"
-echo "RUN echo 'export PATH="$PYENV_ROOT/bin:$PATH"'     >> ~/.bashrc"
-echo "RUN echo 'eval "$(pyenv init -)"'                  >> ~/.bashrc"
-echo "RUN echo 'eval "$(pyenv virtualenv-init -)"'       >> ~/.bashrc"
+echo "RUN echo 'export PYENV_ROOT=\"/opt/.pyenv\"'         >> ~/.bashrc"
+echo "RUN echo 'export PATH=\"\$PYENV_ROOT/bin:\$PATH\"'     >> ~/.bashrc"
+echo "RUN echo 'eval \"\$(pyenv init -)\"'                  >> ~/.bashrc"
+echo "RUN echo 'eval \"\$(pyenv virtualenv-init -)\"'       >> ~/.bashrc"
+echo "RUN cat ~/.bashrc"
 echo "RUN bash -i -c \"source ~/.bashrc\""
 echo "RUN pyenv install 3.5.2 \
     && pyenv global 3.5.2 \
