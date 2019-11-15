@@ -62,19 +62,20 @@ echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget curl vim less 
 # default 3.5.2
 echo "RUN apt-get install -y software-properties-common python-software-properties libffi-dev python2.7-dev python3-dev"
 
-echo "ENV PATH=/opt/.pyenv/bin:/opt/.pyenv/shims:$PATH
-RUN curl -fsSL https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash \
-    && { echo; \
-        echo 'eval \"$(pyenv init -)\"'; \
-        echo 'eval \"$(pyenv virtualenv-init -)\"'; } >> .bashrc \
-    && pyenv install 3.5.2 \
+echo "ENV PYENV_ROOT /opt/.pyenv"
+echo "ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH"
+echo "RUN curl -fsSL https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash"
+echo "RUN echo 'export PYENV_ROOT="/opt/.pyenv"'         >> ~/.bashrc"
+echo "RUN echo 'export PATH="$PYENV_ROOT/bin:$PATH"'     >> ~/.bashrc"
+echo "RUN echo 'eval "$(pyenv init -)"'                  >> ~/.bashrc"
+echo "RUN echo 'eval "$(pyenv virtualenv-init -)"'       >> ~/.bashrc"
+echo "bash -i -c \"source ~/.bashrc\""
+echo "RUN pyenv install 3.5.2 \
     && pyenv global 3.5.2 \
     && pip install virtualenv pipenv \
     && pip install 'PyYAML==3.12'  --ignore-installed \
     && pip install awscli simplejson boto boto3 botocore six 'cryptography>=2.5' 'ansible==2.8.6' google_compute_engine \
     && rm -rf /tmp/*"
-echo "RUN /bin/bash -c \"source .bashrc\""
-echo "ENV PYENV_ROOT \"/opt/.pyenv\""
 # dub-specific
 echo "RUN pyenv install 3.7.0 \
     && rm -rf /tmp/*"
