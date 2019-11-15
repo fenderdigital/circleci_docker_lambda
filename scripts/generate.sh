@@ -69,7 +69,7 @@ echo "RUN echo 'export PYENV_ROOT="/opt/.pyenv"'         >> ~/.bashrc"
 echo "RUN echo 'export PATH="$PYENV_ROOT/bin:$PATH"'     >> ~/.bashrc"
 echo "RUN echo 'eval "$(pyenv init -)"'                  >> ~/.bashrc"
 echo "RUN echo 'eval "$(pyenv virtualenv-init -)"'       >> ~/.bashrc"
-echo "bash -i -c \"source ~/.bashrc\""
+echo "RUN bash -i -c \"source ~/.bashrc\""
 echo "RUN pyenv install 3.5.2 \
     && pyenv global 3.5.2 \
     && pip install virtualenv pipenv \
