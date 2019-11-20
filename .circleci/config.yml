@@ -12,8 +12,9 @@ image_config: &image_config
   # RUBY_VERSION_NUM:
 
   # NODE_VERSION_NUM:
-
-  # PYTHON_VERSION_NUM:
+  
+  # Default python version is the first value in the string below:"
+  PYTHON_VERSION_NUM: "3.5.2 3.6.8 3.7.2"
 
   GOVERS: "1.9.4"
 

@@ -71,25 +71,21 @@ echo "RUN echo 'eval \"\$(pyenv init -)\"'                                      
 echo "RUN echo 'eval \"\$(pyenv virtualenv-init -)\"'                               >> ~/.bashrc"
 echo "RUN cat ~/.bashrc"
 echo "RUN bash -i -c \"source ~/.bashrc\""
-echo "RUN pyenv install 3.5.2 \
-    && pyenv global 3.5.2 \
-    && pip install virtualenv pipenv \
-    && pip install 'PyYAML==3.12'  --ignore-installed \
+
+for PYTHON_VERSION in $PYTHON_VERSION_NUM
+    do
+      echo "RUN pyenv install $PYTHON_VERSION \
+            && rm -rf /tmp/*"
+    done
+
+DEFAULT_PYTHON_VERSION=$(echo $PYTHON_VERSION_NUM | cut -d" " -f1)
+
+echo "RUN pyenv global $DEFAULT_PYTHON_VERSION"
+
+# Install Ansible
+echo "RUN pip install 'PyYAML==3.12'  --ignore-installed \
     && pip install awscli simplejson boto boto3 botocore six 'cryptography>=2.5' 'ansible==2.8.6' google_compute_engine \
     && rm -rf /tmp/*"
-# dub-specific
-echo "RUN pyenv install 3.7.2 \
-    && rm -rf /tmp/*"
-# data-specific
-echo "RUN pyenv install 3.6.8 \
-    && rm -rf /tmp/*"
-# on-demand
-if [[ "$PYTHON_VERSION_NUM" != "3.7.2"  && "$PYTHON_VERSION_NUM" != "3.6.8" && "$PYTHON_VERSION_NUM" != "3.5.2" ]];then
-    if [ ! -e $PYTHON_VERSION_NUM ] ; then
-      echo "RUN pyenv install $PYTHON_VERSION_NUM \
-            && rm -rf /tmp/*"
-    fi
-fi
 
 # Install Golang
 echo "RUN export GOPATH=\"/root/gowork$GOVERS\" && \
