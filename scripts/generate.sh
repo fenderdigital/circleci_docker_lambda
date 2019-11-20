@@ -60,7 +60,7 @@ echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget curl vim less 
 
 # Install Python
 # default 3.5.2
-echo "RUN apt-get install -y software-properties-common python-software-properties libffi-dev python2.7-dev python3-dev"
+echo "RUN apt-get install -y software-properties-common python-software-properties libffi-dev python3-dev"
 
 echo "ENV PYENV_ROOT /opt/circleci/.pyenv"
 echo "ENV PATH $PYENV_ROOT/bin/shims:$PYENV_ROOT/bin:$PATH"
@@ -78,13 +78,13 @@ echo "RUN pyenv install 3.5.2 \
     && pip install awscli simplejson boto boto3 botocore six 'cryptography>=2.5' 'ansible==2.8.6' google_compute_engine \
     && rm -rf /tmp/*"
 # dub-specific
-echo "RUN pyenv install 3.7.0 \
+echo "RUN pyenv install 3.7.2 \
     && rm -rf /tmp/*"
 # data-specific
-echo "RUN pyenv install 2.7.17 \
+echo "RUN pyenv install 3.6.8 \
     && rm -rf /tmp/*"
 # on-demand
-if [[ "$PYTHON_VERSION_NUM" != "3.7.0"  && "$PYTHON_VERSION_NUM" != "2.7.17" && "$PYTHON_VERSION_NUM" != "3.5.2" ]];then
+if [[ "$PYTHON_VERSION_NUM" != "3.7.2"  && "$PYTHON_VERSION_NUM" != "3.6.8" && "$PYTHON_VERSION_NUM" != "3.5.2" ]];then
     if [ ! -e $PYTHON_VERSION_NUM ] ; then
       echo "RUN pyenv install $PYTHON_VERSION_NUM \
             && rm -rf /tmp/*"
