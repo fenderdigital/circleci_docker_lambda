@@ -56,7 +56,7 @@ fi
 
 ## Fender-specific items ##
 
-echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget curl vim less htop apt-transport-https"
+echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget curl vim less htop apt-transport-https groff"
 
 # Install Python
 # default 3.5.2
