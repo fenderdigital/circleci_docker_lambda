@@ -81,6 +81,7 @@ for PYTHON_VERSION in $PYTHON_VERSION_NUM
 DEFAULT_PYTHON_VERSION=$(echo $PYTHON_VERSION_NUM | cut -d" " -f1)
 
 echo "RUN pyenv global $DEFAULT_PYTHON_VERSION"
+echo "RUN pip install -U pip"
 
 # Install Ansible
 echo "RUN pip install 'PyYAML==3.12'  --ignore-installed \
