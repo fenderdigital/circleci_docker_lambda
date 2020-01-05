@@ -122,7 +122,6 @@ apt-get update && apt-get -y install elasticsearch=5.5.3 && \
 /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-icu"
 
 # Install additional end2end-related items
-### NOTE !!!! new python default is 3.5.2 so TODO: validate if "sh" package is going to work correctly after run with 2.7.17 as global !!!!
 echo "RUN pip install sh && \
 apt-get -y install postgresql postgresql-contrib && \
 mkdir -p /usr/local/pgsql/data && \
