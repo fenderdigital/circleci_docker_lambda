@@ -3,6 +3,7 @@
 echo "FROM buildpack-deps:$(awk -F'_' '{print tolower($2)}' <<< $LINUX_VERSION)"
 
 echo "RUN apt-get update"
+echo "ENV DEBIAN_FRONTEND noninteractive"
 
 if [ ! -e $RUBY_VERSION_NUM ] ; then
     echo "RUN apt-get install -y libssl-dev && wget http://ftp.ruby-lang.org/pub/ruby/$(awk -F'.' '{ print $1"."$2 }' <<< $RUBY_VERSION_NUM)/ruby-$RUBY_VERSION_NUM.tar.gz && \
@@ -24,15 +25,6 @@ if [ ! -e $NODE_VERSION_NUM ] ; then
     make install && \
     cd .. && \
     rm -r node-v$NODE_VERSION_NUM"
-fi
-
-if [ ! -e $PYTHON_VERSION_NUM ] ; then
-    echo "RUN wget https://www.python.org/ftp/python/$PYTHON_VERSION_NUM/Python-$PYTHON_VERSION_NUM.tgz && \
-    tar xzf Python-$PYTHON_VERSION_NUM.tgz && \
-    rm Python-$PYTHON_VERSION_NUM.tgz && \
-    cd Python-$PYTHON_VERSION_NUM && \
-    ./configure && \
-    make install"
 fi
 
 if [ $JAVA = "true" ] ; then
@@ -64,7 +56,37 @@ fi
 
 ## Fender-specific items ##
 
-echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget vim less htop"
+echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget curl vim less htop apt-transport-https groff"
+
+# Install Python
+# default 3.5.2
+echo "RUN apt-get install -y software-properties-common python-software-properties libffi-dev python3-dev"
+
+echo "ENV PYENV_ROOT /opt/circleci/.pyenv"
+echo "ENV PATH $PYENV_ROOT/bin/shims:$PYENV_ROOT/bin:$PATH"
+echo "RUN curl -fsSL https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash"
+echo "RUN echo 'export PYENV_ROOT=\"/opt/circleci/.pyenv\"'                         >> ~/.bashrc"
+echo "RUN echo 'export PATH=\"\$PYENV_ROOT/bin:\$PYENV_ROOT/bin/shims:\$PATH\"'     >> ~/.bashrc"
+echo "RUN echo 'eval \"\$(pyenv init -)\"'                                          >> ~/.bashrc"
+echo "RUN echo 'eval \"\$(pyenv virtualenv-init -)\"'                               >> ~/.bashrc"
+echo "RUN cat ~/.bashrc"
+echo "RUN bash -i -c \"source ~/.bashrc\""
+
+for PYTHON_VERSION in $PYTHON_VERSION_NUM
+    do
+      echo "RUN pyenv install $PYTHON_VERSION \
+            && rm -rf /tmp/*"
+    done
+
+DEFAULT_PYTHON_VERSION=$(echo $PYTHON_VERSION_NUM | cut -d" " -f1)
+
+echo "RUN pyenv global $DEFAULT_PYTHON_VERSION"
+echo "RUN pip install -U pip"
+
+# Install Ansible
+echo "RUN pip install 'PyYAML==3.12'  --ignore-installed \
+    && pip install awscli simplejson boto boto3 botocore six 'cryptography>=2.5' 'ansible==2.8.6' google_compute_engine \
+    && rm -rf /tmp/*"
 
 # Install Golang
 echo "RUN export GOPATH=\"/root/gowork$GOVERS\" && \
@@ -87,12 +109,6 @@ echo "RUN git clone https://github.com/kamatama41/tfenv.git /root/.tfenv && \
 export PATH=\"/root/.tfenv/bin:$PATH\" && \
 tfenv install latest:^0.11"
 
-# Install Ansible
-echo "RUN apt-get install -y python2.7 && \
-update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1 && \
-apt-get -y install python-simplejson python-minimal aptitude python-pip python-dev && \
-pip install google_compute_engine boto boto3 botocore six awscli 'ansible==2.6.2' 'PyYAML==3.12'"
-
 # Install local DynamoDB
 echo "RUN mkdir /root/DynamoDBLocal && \
 wget https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar.gz -P /root/DynamoDBLocal/ && \
@@ -113,12 +129,6 @@ chown -R postgres:postgres /usr/local/pgsql && \
 su -c '/usr/lib/postgresql/9.5/bin/initdb -D /usr/local/pgsql/data' postgres"
 
 ## END Fender-specific items ##
-## Fender-dub-specific items ##
-echo "RUN git clone https://github.com/pyenv/pyenv.git /opt/.pyenv"
-echo "ENV PYENV_ROOT \"/opt/.pyenv\""
-echo "ENV PATH \"/opt/.pyenv/bin/:$PATH\""
-echo "RUN pyenv install 3.7.0"
-## END Fender-dub-specific items ##
 
 # if [ ! -e $PHP_VERSION_NUM ] ; then
 #     wget "http://php.net/distributions/php-${PHP_VERSION_NUM}.tar.xz"
