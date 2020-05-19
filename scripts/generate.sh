@@ -60,7 +60,7 @@ echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget curl vim less 
 
 # Install Python
 # default 3.5.2
-echo "RUN apt-get install -y software-properties-common python-software-properties libffi-dev python3-dev"
+echo "RUN apt-get install -y software-properties-common python-software-properties libffi-dev python3-dev netcat"
 
 echo "ENV PYENV_ROOT /opt/circleci/.pyenv"
 echo "ENV PATH $PYENV_ROOT/bin/shims:$PYENV_ROOT/bin:$PATH"
@@ -85,7 +85,7 @@ echo "RUN pip install -U pip"
 
 # Install Ansible
 echo "RUN pip install 'PyYAML==3.12'  --ignore-installed \
-    && pip install awscli simplejson boto boto3 botocore six 'cryptography>=2.5' 'ansible==2.8.6' google_compute_engine \
+    && pip install awscli simplejson boto boto3 botocore six 'cryptography>=2.5' 'ansible==2.8.6' google_compute_engine sshuttle \
     && rm -rf /tmp/*"
 
 # Install Golang
