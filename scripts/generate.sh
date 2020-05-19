@@ -85,7 +85,7 @@ echo "RUN pip install -U pip"
 
 # Install Ansible
 echo "RUN pip install 'PyYAML==3.12'  --ignore-installed \
-    && pip install awscli simplejson boto boto3 botocore six 'cryptography>=2.5' 'ansible==2.8.6' google_compute_engine sshuttle \
+    && pip install awscli simplejson boto boto3 botocore six 'cryptography>=2.5' 'ansible==2.8.6' google_compute_engine \
     && rm -rf /tmp/*"
 
 # Install Golang
