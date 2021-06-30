@@ -120,8 +120,8 @@ pip install terraform-compliance && \
 pyenv global $CURRENT_PYTHON_VERSION"
 
 # Install tfsec
-echo "RUN wget https://github.com/tfsec/tfsec/releases/download/$TFSEC_VERSION/tfsec-linux-amd64 -O $HOME/.tfenv/bin/tfsec && \
-chmod +x $HOME/.tfenv/bin/tfsec"
+echo "RUN wget https://github.com/tfsec/tfsec/releases/download/$TFSEC_VERSION/tfsec-linux-amd64 -O /root/.tfenv/bin/tfsec && \
+chmod +x /root/.tfenv/bin/tfsec"
 
 # Install local DynamoDB
 echo "RUN mkdir /root/DynamoDBLocal && \
