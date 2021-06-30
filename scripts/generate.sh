@@ -111,16 +111,16 @@ tfenv install latest:$TF_VERSION_REGEX"
 
 # Install Terraform linters
 # Install tflint
-echo "curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash"
+echo "RUN curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash"
 
 # Install terraform-compliance
-echo "CURRENT_PYTHON_VERSION=$(pyenv global) && \
+echo "RUN CURRENT_PYTHON_VERSION=$(pyenv global) && \
 pyenv global 3.8.5 && \
 pip install terraform-compliance && \
 pyenv global $CURRENT_PYTHON_VERSION"
 
 # Install tfsec
-echo "wget https://github.com/tfsec/tfsec/releases/download/$TFSEC_VERSION/tfsec-linux-amd64 -O $HOME/.tfenv/bin/tfsec && \
+echo "RUN wget https://github.com/tfsec/tfsec/releases/download/$TFSEC_VERSION/tfsec-linux-amd64 -O $HOME/.tfenv/bin/tfsec && \
 chmod +x $HOME/.tfenv/bin/tfsec"
 
 # Install local DynamoDB
