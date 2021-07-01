@@ -114,10 +114,9 @@ tfenv install latest:$TF_VERSION_REGEX"
 echo "RUN curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash"
 
 # Install terraform-compliance
-echo "RUN CURRENT_PYTHON_VERSION=$(pyenv global) && \
-pyenv global 3.8.5 && \
+echo "RUN pyenv global 3.8.5 && \
 pip install terraform-compliance && \
-pyenv global $CURRENT_PYTHON_VERSION"
+pyenv global $DEFAULT_PYTHON_VERSION"
 
 # Install tfsec
 echo "RUN wget https://github.com/tfsec/tfsec/releases/download/$TFSEC_VERSION/tfsec-linux-amd64 -O /root/.tfenv/bin/tfsec && \
