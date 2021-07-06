@@ -16,6 +16,8 @@ image_config: &image_config
   PYTHON_VERSION_NUM: "3.6.8 3.7.2 3.8.5"
 
   GOVERS: "1.15.2"
+  TFSEC_VERSION: "v0.39.42"
+  TF_VERSION_REGEX: "^0.14.[0-9]*$"
 
   JAVA: true
 
@@ -39,11 +41,11 @@ jobs:
 
       - run: bash scripts/generate.sh > Dockerfile
 
-      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - run: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
 
-      - run: docker build -t $DOCKER_USERNAME/$IMAGE_NAME:lambda_$CIRCLE_BRANCH .
+      - run: docker build -t $DOCKERHUB_USERNAME/$IMAGE_NAME:lambda_$CIRCLE_BRANCH .
 
-      - run: docker push $DOCKER_USERNAME/$IMAGE_NAME:lambda_$CIRCLE_BRANCH && sleep 10
+      - run: docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:lambda_$CIRCLE_BRANCH && sleep 10
 
       - store_artifacts:
           path: Dockerfile

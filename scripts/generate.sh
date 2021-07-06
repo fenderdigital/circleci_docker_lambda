@@ -107,7 +107,20 @@ wget -q -O honeymarker https://honeycomb.io/download/honeymarker/linux/1.9 && \
 # Install latest version of Terraform
 echo "RUN git clone https://github.com/kamatama41/tfenv.git /root/.tfenv && \
 export PATH=\"/root/.tfenv/bin:$PATH\" && \
-tfenv install latest:^0.11"
+tfenv install latest:$TF_VERSION_REGEX"
+
+# Install Terraform linters
+# Install tflint
+echo "RUN curl https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash"
+
+# Install terraform-compliance
+echo "RUN pyenv global 3.8.5 && \
+pip install terraform-compliance && \
+pyenv global $DEFAULT_PYTHON_VERSION"
+
+# Install tfsec
+echo "RUN wget https://github.com/tfsec/tfsec/releases/download/$TFSEC_VERSION/tfsec-linux-amd64 -O /root/.tfenv/bin/tfsec && \
+chmod +x /root/.tfenv/bin/tfsec"
 
 # Install local DynamoDB
 echo "RUN mkdir /root/DynamoDBLocal && \
