@@ -32,7 +32,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     done
     echo "RUN . /root/.nvm/nvm.sh && \
     nvm use 16.6.1 && \
-    npm install -g serverless && \
+    npm install -g serverless || \
     cat /root/.npm/_logs/*.log"
 fi
 
