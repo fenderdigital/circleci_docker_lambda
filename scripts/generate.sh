@@ -33,7 +33,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     echo "RUN . /root/.nvm/nvm.sh && \
     nvm use 16.6.1 && \
     npm install -g serverless && \
-    echo /root/.npm/_logs/*.log"
+    cat /root/.npm/_logs/*.log"
 fi
 
 if [ $JAVA = "true" ] ; then
