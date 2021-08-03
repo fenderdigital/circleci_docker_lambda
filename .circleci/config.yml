@@ -13,7 +13,7 @@ image_config: &image_config
   NODE_VERSIONS_NUM: "16.6.1"
 
   # Default python version is the first value in the string below:"
-  PYTHON_VERSION_NUM: "3.6.8 3.7.2 3.8.5"
+  PYTHON_VERSION_NUM: "3.8.5" # "3.8.5 3.7.2 3.6.8"
 
   GOVERS: "1.15.2"
   TFSEC_VERSION: "v0.39.42"
