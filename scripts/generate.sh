@@ -30,7 +30,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     do
       echo "RUN . /root/.nvm/nvm.sh && nvm install $NODE_VERSION"
     done
-    echo "RUN . /root/.nvm/nvm.sh && nvm use 16.6.1 && sudo npm install -g serverless"
+    echo "RUN . /root/.nvm/nvm.sh && nvm use 16.6.1 && npm install -g serverless"
 fi
 
 if [ $JAVA = "true" ] ; then
