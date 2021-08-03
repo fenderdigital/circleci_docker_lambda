@@ -88,7 +88,7 @@ for PYTHON_VERSION in $PYTHON_VERSION_NUM
 DEFAULT_PYTHON_VERSION=$(echo $PYTHON_VERSION_NUM | cut -d" " -f1)
 
 echo "RUN pyenv global $DEFAULT_PYTHON_VERSION"
-echo "RUN pip install -U pip"
+echo "RUN pip install -U pip==20.1.1"
 
 # Install Ansible
 echo "RUN export PYTHONIOENCODING=utf8 \
