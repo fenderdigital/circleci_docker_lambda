@@ -1,12 +1,12 @@
 #!/bin/bash
 
-echo "FROM cimg/base:stable"
+echo "FROM buildpack-deps:$(awk -F'_' '{print tolower($2)}' <<< $LINUX_VERSION)"
 
-echo "RUN sudo apt-get update"
+echo "RUN apt-get update"
 echo "ENV DEBIAN_FRONTEND noninteractive"
 
 if [ ! -e $RUBY_VERSION_NUM ] ; then
-    echo "RUN sudo apt-get install -y libssl-dev && wget http://ftp.ruby-lang.org/pub/ruby/$(awk -F'.' '{ print $1"."$2 }' <<< $RUBY_VERSION_NUM)/ruby-$RUBY_VERSION_NUM.tar.gz && \
+    echo "RUN apt-get install -y libssl-dev && wget http://ftp.ruby-lang.org/pub/ruby/$(awk -F'.' '{ print $1"."$2 }' <<< $RUBY_VERSION_NUM)/ruby-$RUBY_VERSION_NUM.tar.gz && \
     tar -xzvf ruby-$RUBY_VERSION_NUM.tar.gz && \
     cd ruby-$RUBY_VERSION_NUM/ && \
     ./configure && \
@@ -16,11 +16,11 @@ if [ ! -e $RUBY_VERSION_NUM ] ; then
 fi
 
 if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
-    echo "RUN sudo apt-get -y install apt-transport-https ca-certificates && \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
-    echo 'deb https://dl.yarnpkg.com/debian/ stable main' | sudo tee /etc/apt/sources.list.d/yarn.list && \
-    sudo apt-get update && \
-    sudo apt-get -y install build-essential libappindicator1 libnss3 yarn jq"
+    echo "RUN apt-get -y install apt-transport-https ca-certificates && \
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    echo 'deb https://dl.yarnpkg.com/debian/ stable main' | tee /etc/apt/sources.list.d/yarn.list && \
+    apt-get update && \
+    apt-get -y install build-essential libappindicator1 libnss3 yarn jq"
 
     #Install nvm
     echo "RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash"
@@ -28,7 +28,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
 
     for NODE_VERSION in $NODE_VERSIONS_NUM
     do
-      echo "RUN sudo source /root/.nvm/nvm.sh && sudo nvm install $NODE_VERSION"
+      echo "RUN . /root/.nvm/nvm.sh && nvm install $NODE_VERSION"
     done
 fi
 
@@ -36,36 +36,36 @@ if [ $JAVA = "true" ] ; then
 cat << EOF
 RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
     echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \\
-    sudo apt-get update && sudo apt-get -y install -t jessie-backports openjdk-8-jdk ca-certificates-java \\
+    apt-get update && apt-get -y install -t jessie-backports openjdk-8-jdk ca-certificates-java \\
 ; elif [ \$(grep 'VERSION_ID="9"' /etc/os-release) ] ; then \\
-    sudo apt-get update && sudo apt-get -y -q --no-install-recommends install -t stable openjdk-8-jdk ca-certificates-java \\
+    apt-get update && apt-get -y -q --no-install-recommends install -t stable openjdk-8-jdk ca-certificates-java \\
 ; elif [ \$(grep 'VERSION_ID="14.04"' /etc/os-release) ] ; then \\
-    sudo apt-get update && \\
-    sudo apt-get --force-yes -y install software-properties-common python-software-properties && \\
+    apt-get update && \\
+    apt-get --force-yes -y install software-properties-common python-software-properties && \\
     echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
     echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
     cd /var/tmp/ && \\
     wget -O oracle_java8.deb debian.opennms.org/dists/opennms-23/main/binary-all/oracle-java8-installer_8u131-1~webupd8~2_all.deb && \\
-    dpkg -i oracle_java8.deb || echo "ok" && sudo apt-get -f install -yq \\
+    dpkg -i oracle_java8.deb || echo "ok" && apt-get -f install -yq \\
 ; elif [ \$(grep 'VERSION_ID="16.04"' /etc/os-release) ] ; then \\
-    sudo apt-get update && \\
-    sudo apt-get --force-yes -y install software-properties-common python-software-properties && \\
+    apt-get update && \\
+    apt-get --force-yes -y install software-properties-common python-software-properties && \\
     echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
     echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
     cd /var/tmp/ && \\
     wget -O oracle_java8.deb debian.opennms.org/dists/opennms-23/main/binary-all/oracle-java8-installer_8u131-1~webupd8~2_all.deb && \\
-    dpkg -i oracle_java8.deb || echo "ok" && sudo apt-get -f install -yq \\
+    dpkg -i oracle_java8.deb || echo "ok" && apt-get -f install -yq \\
 ; fi
 EOF
 fi
 
 ## Fender-specific items ##
 
-echo "RUN sudo apt-get install -y zip unzip rsync parallel tar jq wget curl vim less htop apt-transport-https groff"
+echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget curl vim less htop apt-transport-https groff"
 
 # Install Python
 # default 3.5.2
-echo "RUN sudo apt-get install -y software-properties-common python-software-properties libffi-dev python3-dev netcat"
+echo "RUN apt-get install -y software-properties-common python-software-properties libffi-dev python3-dev netcat"
 
 echo "ENV PYENV_ROOT /opt/circleci/.pyenv"
 echo "ENV PATH $PYENV_ROOT/bin/shims:$PYENV_ROOT/bin:$PATH"
@@ -133,15 +133,15 @@ wget https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar
 tar -xvf /root/DynamoDBLocal/dynamodb_local_latest.tar.gz -C /root/DynamoDBLocal/"
 
 # Install local Elasticsearch
-echo "RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
-sudo apt-get -y install apt-transport-https && \
-echo 'deb https://artifacts.elastic.co/packages/5.x/apt stable main' | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list && \
-sudo apt-get update && sudo apt-get -y install elasticsearch=5.5.3 && \
+echo "RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
+apt-get -y install apt-transport-https && \
+echo 'deb https://artifacts.elastic.co/packages/5.x/apt stable main' | tee -a /etc/apt/sources.list.d/elastic-5.x.list && \
+apt-get update && apt-get -y install elasticsearch=5.5.3 && \
 /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-icu"
 
 # Install additional end2end-related items
 echo "RUN pip install sh && \
-sudo apt-get -y install postgresql postgresql-contrib && \
+apt-get -y install postgresql postgresql-contrib && \
 mkdir -p /usr/local/pgsql/data && \
 chown -R postgres:postgres /usr/local/pgsql && \
 su -c '/usr/lib/postgresql/9.5/bin/initdb -D /usr/local/pgsql/data' postgres"
@@ -153,11 +153,11 @@ su -c '/usr/lib/postgresql/9.5/bin/initdb -D /usr/local/pgsql/data' postgres"
 # fi
 
 if [ $MYSQL_CLIENT = "true" ] ; then
-    echo "RUN sudo apt-get -y install mysql-client"
+    echo "RUN apt-get -y install mysql-client"
 fi
 
 if [ $POSTGRES_CLIENT = "true" ] ; then
-    echo "RUN sudo apt-get -y install postgresql-client"
+    echo "RUN apt-get -y install postgresql-client"
 fi
 
 if [ $DOCKERIZE = "true" ] ; then
@@ -182,15 +182,15 @@ echo "RUN perl -MCPAN -e 'install TAP::Parser'"
 echo "RUN perl -MCPAN -e 'install XML::Generator'"
 
 # install lsb-release, etc., for testing linux distro
-echo "RUN sudo apt-get update && sudo apt-get -y install lsb-release unzip"
+echo "RUN apt-get update && apt-get -y install lsb-release unzip"
 
 if [ $BROWSERS = "true" ] ; then
 cat << EOF
 RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
     echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \\
-    sudo apt-get update && sudo apt-get -y install -t jessie-backports xvfb phantomjs \\
+    apt-get update && apt-get -y install -t jessie-backports xvfb phantomjs \\
 ; else \\
-		sudo apt-get update && sudo apt-get -y install xvfb phantomjs \\
+		apt-get update && apt-get -y install xvfb phantomjs \\
 ; fi
 EOF
 echo "ENV DISPLAY :99"
@@ -198,19 +198,19 @@ echo "ENV DISPLAY :99"
 echo "# install firefox
 RUN curl --silent --show-error --location --fail --retry 3 --output /tmp/firefox.deb https://s3.amazonaws.com/circle-downloads/firefox-mozilla-build_47.0.1-0ubuntu1_amd64.deb \
   && echo 'ef016febe5ec4eaf7d455a34579834bcde7703cb0818c80044f4d148df8473bb  /tmp/firefox.deb' | sha256sum -c \
-  && dpkg -i /tmp/firefox.deb || sudo apt-get -f install  \
-  && sudo apt-get install -y libgtk3.0-cil-dev libasound2 libasound2 libdbus-glib-1-2 libdbus-1-3 \
+  && dpkg -i /tmp/firefox.deb || apt-get -f install  \
+  && apt-get install -y libgtk3.0-cil-dev libasound2 libasound2 libdbus-glib-1-2 libdbus-1-3 \
   && rm -rf /tmp/firefox.deb"
 
 echo "# install chrome
 RUN curl --silent --show-error --location --fail --retry 3 --output /tmp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
-  && (dpkg -i /tmp/google-chrome-stable_current_amd64.deb || sudo apt-get -fy install)  \
+  && (dpkg -i /tmp/google-chrome-stable_current_amd64.deb || apt-get -fy install)  \
   && rm -rf /tmp/google-chrome-stable_current_amd64.deb \
   && sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox --no-sandbox|g' \
        \"/opt/google/chrome/google-chrome\""
 
 echo "# install chromedriver
-RUN sudo apt-get -y install libgconf-2-4 \
+RUN apt-get -y install libgconf-2-4 \
   && curl --silent --show-error --location --fail --retry 3 --output /tmp/chromedriver_linux64.zip \"http://chromedriver.storage.googleapis.com/2.33/chromedriver_linux64.zip\" \
   && cd /tmp \
   && unzip chromedriver_linux64.zip \
