@@ -6,7 +6,7 @@ image_config: &image_config
 
   IMAGE_NAME: circleci
 
-  LINUX_VERSION: UBUNTU_XENIAL
+  LINUX_VERSION: UBUNTU_FOCAL
 
   # RUBY_VERSION_NUM:
 
