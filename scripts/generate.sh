@@ -15,16 +15,21 @@ if [ ! -e $RUBY_VERSION_NUM ] ; then
     ruby -v"
 fi
 
-if [ ! -e $NODE_VERSION_NUM ] ; then
-    echo "RUN wget https://nodejs.org/dist/v$NODE_VERSION_NUM/node-v$NODE_VERSION_NUM.tar.gz && \
-    tar -xzvf node-v$NODE_VERSION_NUM.tar.gz && \
-    rm node-v$NODE_VERSION_NUM.tar.gz && \
-    cd node-v$NODE_VERSION_NUM && \
-    ./configure && \
-    make -j4 && \
-    make install && \
-    cd .. && \
-    rm -r node-v$NODE_VERSION_NUM"
+if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
+    echo "RUN apt-get -y install apt-transport-https ca-certificates && \
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    echo 'deb https://dl.yarnpkg.com/debian/ stable main' | tee /etc/apt/sources.list.d/yarn.list && \
+    apt-get update && \
+    apt-get -y install build-essential libappindicator1 libnss3 yarn jq"
+
+    #Install nvm
+    echo "RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash"
+    echo "ENV NVM_DIR /root/.nvm"
+
+    for NODE_VERSION in $NODE_VERSIONS_NUM
+    do
+      echo "RUN . /root/.nvm/nvm.sh && nvm install $NODE_VERSION"
+    done
 fi
 
 if [ $JAVA = "true" ] ; then
