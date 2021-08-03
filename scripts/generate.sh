@@ -92,7 +92,7 @@ echo "RUN pip install -U pip"
 
 # Install Ansible
 echo "RUN export PYTHONIOENCODING=utf8 \
-    && pip install 'wheel setuptools==49.6.0' \
+    && pip install wheel 'setuptools==49.6.0' \
     && pip install 'PyYAML==3.12' --ignore-installed \
     && pip install awscli simplejson boto boto3 botocore 'cffi==1.14.5' six 'cryptography>=2.5' 'ansible==2.8.6' \
     && pip install google_compute_engine \
