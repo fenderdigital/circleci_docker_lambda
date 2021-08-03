@@ -28,7 +28,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
 
     for NODE_VERSION in $NODE_VERSIONS_NUM
     do
-      echo "RUN . /root/.nvm/nvm.sh && nvm install $NODE_VERSION"
+      echo "RUN sudo . /root/.nvm/nvm.sh && sudo nvm install $NODE_VERSION"
     done
 fi
 
