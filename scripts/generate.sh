@@ -31,7 +31,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
       echo "RUN . /root/.nvm/nvm.sh && nvm install $NODE_VERSION"
     done
     echo "RUN . /root/.nvm/nvm.sh && \
-    nvm use 14.17.4 && \
+    nvm use 16.6.1 && \
     npm install -g serverless"
 fi
 
