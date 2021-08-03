@@ -30,6 +30,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     do
       echo "RUN . /root/.nvm/nvm.sh && nvm install $NODE_VERSION"
     done
+    echo "RUN . /root/.nvm/nvm.sh && nvm use 16.6.1 && sudo npm install -g serverless"
 fi
 
 if [ $JAVA = "true" ] ; then
@@ -60,9 +61,7 @@ EOF
 fi
 
 ## Fender-specific items ##
-
 echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget curl vim less htop apt-transport-https groff"
-echo "RUN . /root/.nvm/nvm.sh && nvm use 16.6.1 && npm install -g serverless"
 
 # Install Python
 # default 3.5.2
