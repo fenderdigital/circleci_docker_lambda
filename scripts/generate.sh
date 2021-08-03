@@ -41,7 +41,7 @@ RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
     apt-get update && apt-get -y -q --no-install-recommends install -t stable openjdk-8-jdk ca-certificates-java \\
 ; elif [ \$(grep 'VERSION_ID="14.04"' /etc/os-release) ] ; then \\
     apt-get update && \\
-    apt-get --force-yes -y install software-properties-common python-software-properties && \\
+    apt-get --force-yes -y install software-properties-common && \\
     echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
     echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
     cd /var/tmp/ && \\
@@ -49,7 +49,7 @@ RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
     dpkg -i oracle_java8.deb || echo "ok" && apt-get -f install -yq \\
 ; elif [ \$(grep 'VERSION_ID="16.04"' /etc/os-release) ] ; then \\
     apt-get update && \\
-    apt-get --force-yes -y install software-properties-common python-software-properties && \\
+    apt-get --force-yes -y install software-properties-common && \\
     echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
     echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
     cd /var/tmp/ && \\
@@ -62,10 +62,11 @@ fi
 ## Fender-specific items ##
 
 echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget curl vim less htop apt-transport-https groff"
+echo "RUN npm install -g serverless"
 
 # Install Python
 # default 3.5.2
-echo "RUN apt-get install -y software-properties-common python-software-properties libffi-dev python3-dev netcat"
+echo "RUN apt-get install -y software-properties-common libffi-dev python3-dev netcat"
 
 echo "ENV PYENV_ROOT /opt/circleci/.pyenv"
 echo "ENV PATH $PYENV_ROOT/bin/shims:$PYENV_ROOT/bin:$PATH"
