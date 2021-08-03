@@ -30,6 +30,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     do
       echo "RUN . /root/.nvm/nvm.sh && nvm install $NODE_VERSION"
     done
+    echo "RUN nvm use 16.6.1"
 fi
 
 if [ $JAVA = "true" ] ; then
