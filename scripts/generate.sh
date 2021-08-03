@@ -17,7 +17,7 @@ fi
 
 if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     echo "RUN sudo apt-get -y install apt-transport-https ca-certificates && \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
     echo 'deb https://dl.yarnpkg.com/debian/ stable main' | tee /etc/apt/sources.list.d/yarn.list && \
     sudo apt-get update && \
     sudo apt-get -y install build-essential libappindicator1 libnss3 yarn jq"
@@ -133,7 +133,7 @@ wget https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar
 tar -xvf /root/DynamoDBLocal/dynamodb_local_latest.tar.gz -C /root/DynamoDBLocal/"
 
 # Install local Elasticsearch
-echo "RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
+echo "RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
 sudo apt-get -y install apt-transport-https && \
 echo 'deb https://artifacts.elastic.co/packages/5.x/apt stable main' | tee -a /etc/apt/sources.list.d/elastic-5.x.list && \
 sudo apt-get update && sudo apt-get -y install elasticsearch=5.5.3 && \
