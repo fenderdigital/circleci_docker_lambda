@@ -15,16 +15,25 @@ if [ ! -e $RUBY_VERSION_NUM ] ; then
     ruby -v"
 fi
 
-if [ ! -e $NODE_VERSION_NUM ] ; then
-    echo "RUN wget https://nodejs.org/dist/v$NODE_VERSION_NUM/node-v$NODE_VERSION_NUM.tar.gz && \
-    tar -xzvf node-v$NODE_VERSION_NUM.tar.gz && \
-    rm node-v$NODE_VERSION_NUM.tar.gz && \
-    cd node-v$NODE_VERSION_NUM && \
-    ./configure && \
-    make -j4 && \
-    make install && \
-    cd .. && \
-    rm -r node-v$NODE_VERSION_NUM"
+if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
+    echo "RUN apt-get -y install apt-transport-https ca-certificates && \
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    echo 'deb https://dl.yarnpkg.com/debian/ stable main' | tee /etc/apt/sources.list.d/yarn.list && \
+    apt-get update && \
+    apt-get -y install build-essential libappindicator1 libnss3 yarn jq"
+
+    #Install nvm
+    echo "RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash"
+    echo "ENV NVM_DIR /root/.nvm"
+
+    DEFAULT_NODE_VERSION=$(echo $NODE_VERSIONS_NUM | cut -d" " -f1)
+    for NODE_VERSION in $NODE_VERSIONS_NUM
+    do
+      echo "RUN . /root/.nvm/nvm.sh && nvm install $NODE_VERSION"
+    done
+    echo "RUN . /root/.nvm/nvm.sh && \
+    nvm use $DEFAULT_NODE_VERSION && \
+    yarn global add serverless"
 fi
 
 if [ $JAVA = "true" ] ; then
@@ -36,7 +45,7 @@ RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
     apt-get update && apt-get -y -q --no-install-recommends install -t stable openjdk-8-jdk ca-certificates-java \\
 ; elif [ \$(grep 'VERSION_ID="14.04"' /etc/os-release) ] ; then \\
     apt-get update && \\
-    apt-get --force-yes -y install software-properties-common python-software-properties && \\
+    apt-get --force-yes -y install software-properties-common && \\
     echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
     echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
     cd /var/tmp/ && \\
@@ -44,7 +53,7 @@ RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
     dpkg -i oracle_java8.deb || echo "ok" && apt-get -f install -yq \\
 ; elif [ \$(grep 'VERSION_ID="16.04"' /etc/os-release) ] ; then \\
     apt-get update && \\
-    apt-get --force-yes -y install software-properties-common python-software-properties && \\
+    apt-get --force-yes -y install software-properties-common && \\
     echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
     echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
     cd /var/tmp/ && \\
@@ -55,12 +64,11 @@ EOF
 fi
 
 ## Fender-specific items ##
-
 echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget curl vim less htop apt-transport-https groff"
 
 # Install Python
 # default 3.5.2
-echo "RUN apt-get install -y software-properties-common python-software-properties libffi-dev python3-dev netcat"
+echo "RUN apt-get install -y software-properties-common libffi-dev python3-dev netcat"
 
 echo "ENV PYENV_ROOT /opt/circleci/.pyenv"
 echo "ENV PATH $PYENV_ROOT/bin/shims:$PYENV_ROOT/bin:$PATH"
@@ -81,11 +89,14 @@ for PYTHON_VERSION in $PYTHON_VERSION_NUM
 DEFAULT_PYTHON_VERSION=$(echo $PYTHON_VERSION_NUM | cut -d" " -f1)
 
 echo "RUN pyenv global $DEFAULT_PYTHON_VERSION"
-echo "RUN pip install -U pip"
+echo "RUN pip install -U pip==20.1.1"
 
 # Install Ansible
-echo "RUN pip install 'PyYAML==3.12'  --ignore-installed \
-    && pip install awscli simplejson boto boto3 botocore six 'cryptography>=2.5' 'ansible==2.8.6' google_compute_engine \
+echo "RUN export PYTHONIOENCODING=utf8 \
+    && pip install wheel 'setuptools==49.6.0' \
+    && pip install 'PyYAML==3.12' --ignore-installed \
+    && pip install awscli simplejson boto boto3 botocore 'cffi==1.14.5' six 'cryptography>=2.5' 'ansible==2.8.6' \
+    && pip install google_compute_engine \
     && rm -rf /tmp/*"
 
 # Install Golang
@@ -121,25 +132,6 @@ pyenv global $DEFAULT_PYTHON_VERSION"
 # Install tfsec
 echo "RUN wget https://github.com/tfsec/tfsec/releases/download/$TFSEC_VERSION/tfsec-linux-amd64 -O /root/.tfenv/bin/tfsec && \
 chmod +x /root/.tfenv/bin/tfsec"
-
-# Install local DynamoDB
-echo "RUN mkdir /root/DynamoDBLocal && \
-wget https://s3-us-west-2.amazonaws.com/dynamodb-local/dynamodb_local_latest.tar.gz -P /root/DynamoDBLocal/ && \
-tar -xvf /root/DynamoDBLocal/dynamodb_local_latest.tar.gz -C /root/DynamoDBLocal/"
-
-# Install local Elasticsearch
-echo "RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
-apt-get -y install apt-transport-https && \
-echo 'deb https://artifacts.elastic.co/packages/5.x/apt stable main' | tee -a /etc/apt/sources.list.d/elastic-5.x.list && \
-apt-get update && apt-get -y install elasticsearch=5.5.3 && \
-/usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-icu"
-
-# Install additional end2end-related items
-echo "RUN pip install sh && \
-apt-get -y install postgresql postgresql-contrib && \
-mkdir -p /usr/local/pgsql/data && \
-chown -R postgres:postgres /usr/local/pgsql && \
-su -c '/usr/lib/postgresql/9.5/bin/initdb -D /usr/local/pgsql/data' postgres"
 
 ## END Fender-specific items ##
 

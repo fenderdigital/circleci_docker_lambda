@@ -6,13 +6,14 @@ image_config: &image_config
 
   IMAGE_NAME: circleci
 
-  LINUX_VERSION: UBUNTU_XENIAL
+  LINUX_VERSION: UBUNTU_FOCAL
 
   # RUBY_VERSION_NUM:
 
-  # NODE_VERSION_NUM:
+  # Default node version is the first value in the string below:
+  NODE_VERSIONS_NUM: "16.6.1"
 
-  # Default python version is the first value in the string below:"
+  # Default python version is the first value in the string below:
   PYTHON_VERSION_NUM: "3.6.8 3.7.2 3.8.5"
 
   GOVERS: "1.15.2"
