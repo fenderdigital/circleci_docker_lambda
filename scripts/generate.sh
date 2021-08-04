@@ -26,12 +26,13 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     echo "RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash"
     echo "ENV NVM_DIR /root/.nvm"
 
+    DEFAULT_NODE_VERSION=$(echo $NODE_VERSIONS_NUM | cut -d" " -f1)
     for NODE_VERSION in $NODE_VERSIONS_NUM
     do
       echo "RUN . /root/.nvm/nvm.sh && nvm install $NODE_VERSION"
     done
     echo "RUN . /root/.nvm/nvm.sh && \
-    nvm use 16.6.1 && \
+    nvm use $DEFAULT_NODE_VERSION && \
     yarn global add serverless"
 fi
 
