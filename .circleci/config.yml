@@ -18,7 +18,7 @@ image_config: &image_config
 
   GOVERS: "1.16.6"
   TFSEC_VERSION: "v0.39.42"
-  TF_VERSION_REGEX: "^0.14.[0-9]*$"
+  TF_VERSION_REGEX: "^0.15.3$"
 
   JAVA: true
 
