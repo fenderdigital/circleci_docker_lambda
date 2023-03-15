@@ -110,8 +110,8 @@ mkdir gowork$GOVERS && \
 export PATH=\"/usr/local/go$GOVERS/bin:$PATH\" && \
 go install golang.org/x/tools/cmd/cover@latest && \
 go install github.com/mattn/goveralls@latest && \
-wget -q -O honeymarker https://honeycomb.io/download/honeymarker/linux/1.9 && \
-  echo 'e74514a2baaf63a5828ff62ca2ca1aa86b3a4ab223ab6a7c53f969d7b55e37fb  honeymarker' | sha256sum -c && \
+wget -q -O honeymarker https://github.com/honeycombio/honeymarker/releases/download/v0.2.10/honeymarker-linux-amd64 && \
+  echo '6e08038f4587d515856076746ad3a69e67376eddd38d8657f449aad393b95cd8  honeymarker' | sha256sum -c && \
   chmod 755 ./honeymarker && \
   mv honeymarker /usr/bin"
 
