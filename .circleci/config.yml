@@ -16,7 +16,7 @@ image_config: &image_config
   # Default python version is the first value in the string below:
   PYTHON_VERSION_NUM: "3.6.8 3.7.2 3.8.5"
 
-  GOVERS: "1.18.1"
+  GOVERS: "1.21.5"
   TFSEC_VERSION: "v1.4.2"
   TF_VERSION_REGEX: "^1.1"
 
