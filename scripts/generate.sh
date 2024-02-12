@@ -122,8 +122,8 @@ tfenv install latest:$TF_VERSION_REGEX"
 
 # Install Terraform linters
 # Install tflint
-echo "export TFLINT_VERSION=$TFLINT_VERSION && \
-RUN curl https://raw.githubusercontent.com/terraform-linters/tflint/$TFLINT_VERSION/install_linux.sh | bash"
+echo "RUN export TFLINT_VERSION=$TFLINT_VERSION && \
+curl https://raw.githubusercontent.com/terraform-linters/tflint/$TFLINT_VERSION/install_linux.sh | bash"
 
 # Install terraform-compliance
 echo "RUN pyenv global 3.8.5 && \
