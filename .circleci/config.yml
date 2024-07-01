@@ -19,7 +19,6 @@ image_config: &image_config
   GOVERS: "1.21.5"
   TFSEC_VERSION: "v1.28.5"
   TFLINT_VERSION: "v0.49.0"
-  TF_VERSION_REGEX: "^1.1"
 
   JAVA: true
 
