@@ -33,7 +33,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
     done
     echo "RUN . /root/.nvm/nvm.sh && \
     nvm use $DEFAULT_NODE_VERSION && \
-    yarn global add serverless"
+    yarn global add serverless@3.39.0"
 fi
 
 if [ $JAVA = "true" ] ; then
