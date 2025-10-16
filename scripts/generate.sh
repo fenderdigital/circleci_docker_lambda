@@ -102,7 +102,7 @@ echo "RUN export PYTHONIOENCODING=utf8 \
 # Install Golang
 echo "RUN export GOPATH=\"/root/gowork$GOVERS\" && \
 export GOROOT=\"/usr/local/go$GOVERS\" && \
-wget https://storage.googleapis.com/golang/go$GOVERS.linux-amd64.tar.gz && \
+wget https://go.dev/dl/go$GOVERS.linux-amd64.tar.gz && \
 tar -xzf go$GOVERS.linux-amd64.tar.gz && \
 mv go /usr/local/go$GOVERS && \
 rm go$GOVERS.linux-amd64.tar.gz && \
