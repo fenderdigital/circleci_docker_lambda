@@ -3,7 +3,7 @@
 echo "FROM buildpack-deps:$(awk -F'_' '{print tolower($2)}' <<< $LINUX_VERSION)"
 
 echo "RUN apt-get update"
-echo "ENV DEBIAN_FRONTEND noninteractive"
+echo "ENV DEBIAN_FRONTEND=noninteractive"
 
 if [ ! -e $RUBY_VERSION_NUM ] ; then
     echo "RUN apt-get install -y libssl-dev && wget http://ftp.ruby-lang.org/pub/ruby/$(awk -F'.' '{ print $1"."$2 }' <<< $RUBY_VERSION_NUM)/ruby-$RUBY_VERSION_NUM.tar.gz && \
@@ -24,7 +24,7 @@ if [ ! -e "$NODE_VERSIONS_NUM" ] ; then
 
     #Install nvm
     echo "RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash"
-    echo "ENV NVM_DIR /root/.nvm"
+    echo "ENV NVM_DIR=/root/.nvm"
 
     DEFAULT_NODE_VERSION=$(echo $NODE_VERSIONS_NUM | cut -d" " -f1)
     for NODE_VERSION in $NODE_VERSIONS_NUM
@@ -70,8 +70,8 @@ echo "RUN apt-get install -y zip unzip rsync parallel tar jq wget curl vim less 
 # default 3.5.2
 echo "RUN apt-get install -y software-properties-common libffi-dev python3-dev netcat"
 
-echo "ENV PYENV_ROOT /opt/circleci/.pyenv"
-echo "ENV PATH $PYENV_ROOT/bin/shims:$PYENV_ROOT/bin:$PATH"
+echo "ENV PYENV_ROOT=/opt/circleci/.pyenv"
+echo "ENV PATH=$PYENV_ROOT/bin/shims:$PYENV_ROOT/bin:$PATH"
 echo "RUN curl -fsSL https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash"
 echo "RUN echo 'export PYENV_ROOT=\"/opt/circleci/.pyenv\"'                         >> ~/.bashrc"
 echo "RUN echo 'export PATH=\"\$PYENV_ROOT/bin:\$PYENV_ROOT/bin/shims:\$PATH\"'     >> ~/.bashrc"
@@ -181,7 +181,7 @@ RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
 		apt-get update && apt-get -y install xvfb phantomjs \\
 ; fi
 EOF
-echo "ENV DISPLAY :99"
+echo "ENV DISPLAY=:99"
 
 echo "# install firefox
 RUN curl --silent --show-error --location --fail --retry 3 --output /tmp/firefox.deb https://s3.amazonaws.com/circle-downloads/firefox-mozilla-build_47.0.1-0ubuntu1_amd64.deb \

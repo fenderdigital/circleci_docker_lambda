@@ -11,12 +11,12 @@ image_config: &image_config
   # RUBY_VERSION_NUM:
 
   # Default node version is the first value in the string below:
-  NODE_VERSIONS_NUM: "18.18.0 20.12.1"
+  NODE_VERSIONS_NUM: "20.12.1 22.22.2 24.14.1"
 
   # Default python version is the first value in the string below:
-  PYTHON_VERSION_NUM: "3.6.8 3.7.2 3.8.5 3.12.10"
+  PYTHON_VERSION_NUM: "3.6.8 3.7.2 3.8.5 3.12.10 3.13.12 3.14.3"
 
-  GOVERS: "1.25.3"
+  GOVERS: "1.26.1"
   TFSEC_VERSION: "v1.28.5"
   TFLINT_VERSION: "v0.49.0"
 
