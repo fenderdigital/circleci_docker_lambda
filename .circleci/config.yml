@@ -1,8 +1,6 @@
-image_config: &image_config
+version: 2.1
 
-  # make sure to set your Docker Hub username & password in CircleCI,
-  # either as project-specific environment variables
-  # or as resources in your organization's org-global Context
+image_config: &image_config
 
   IMAGE_NAME: circleci
 
@@ -30,12 +28,11 @@ image_config: &image_config
 
   BROWSERS: false
 
-version: 2
 jobs:
   build:
-    machine: true
-    environment:
-      <<: *image_config
+    machine:
+      image: ubuntu-2204:current
+    environment: *image_config
 
     steps:
       - checkout
@@ -52,7 +49,6 @@ jobs:
           path: Dockerfile
 
 workflows:
-  version: 2
   dockerfile_wizard:
     jobs:
       - build:
