@@ -187,13 +187,12 @@ emit_python() {
   default_python="$(first_word "${PYTHON_VERSION_NUM}")"
   DEFAULT_PYTHON_VERSION="${default_python}"
 
-  # ENV PATH uses \$PATH so Docker expands it at build time (not the host PATH).
   cat <<EOF
 ENV PYENV_ROOT=/opt/circleci/.pyenv
-ENV PATH=/opt/circleci/.pyenv/bin/shims:/opt/circleci/.pyenv/bin:\$PATH
+ENV PATH=/opt/circleci/.pyenv/shims:/opt/circleci/.pyenv/bin:\$PATH
 RUN curl -fsSL https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash && \\
     echo 'export PYENV_ROOT="/opt/circleci/.pyenv"' >> ~/.bashrc && \\
-    echo 'export PATH="\$PYENV_ROOT/bin:\$PYENV_ROOT/bin/shims:\$PATH"' >> ~/.bashrc && \\
+    echo 'export PATH="\$PYENV_ROOT/shims:\$PYENV_ROOT/bin:\$PATH"' >> ~/.bashrc && \\
     echo 'eval "\$(pyenv init -)"' >> ~/.bashrc && \\
     echo 'eval "\$(pyenv virtualenv-init -)"' >> ~/.bashrc && \\
     bash -i -c "source ~/.bashrc"
