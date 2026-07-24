@@ -1,41 +1,26 @@
-image_config: &image_config
+version: 2.1
 
-  # make sure to set your Docker Hub username & password in CircleCI,
-  # either as project-specific environment variables
-  # or as resources in your organization's org-global Context
+image_config: &image_config
 
   IMAGE_NAME: circleci
 
   LINUX_VERSION: UBUNTU_FOCAL
 
-  # RUBY_VERSION_NUM:
-
   # Default node version is the first value in the string below:
-  NODE_VERSIONS_NUM: "20.12.1 22.22.2 24.14.1"
+  NODE_VERSIONS_NUM: "20.12.1 24.14.1"
 
   # Default python version is the first value in the string below:
-  PYTHON_VERSION_NUM: "3.6.8 3.7.2 3.8.5 3.12.10 3.13.12 3.14.3"
+  PYTHON_VERSION_NUM: "3.6.8 3.7.2 3.8.5 3.12.10 3.14.3"
 
   GOVERS: "1.26.1"
   TFSEC_VERSION: "v1.28.5"
   TFLINT_VERSION: "v0.49.0"
 
-  JAVA: true
-
-  MYSQL_CLIENT: false
-
-  POSTGRES_CLIENT: false
-
-  DOCKERIZE: false
-
-  BROWSERS: false
-
-version: 2
 jobs:
   build:
-    machine: true
-    environment:
-      <<: *image_config
+    machine:
+      image: ubuntu-2204:current
+    environment: *image_config
 
     steps:
       - checkout
@@ -52,7 +37,6 @@ jobs:
           path: Dockerfile
 
 workflows:
-  version: 2
   dockerfile_wizard:
     jobs:
       - build:
