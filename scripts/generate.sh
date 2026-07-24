@@ -1,30 +1,11 @@
 #!/bin/bash
-#
-# Emits a Dockerfile on stdout from CircleCI image_config environment variables.
-#
-# Install and cleanup always share the same RUN layer so Docker does not retain
-# apt lists, pip/yarn/nvm/go caches, or other build artifacts.
-#
 
 set -e
 
-# ---------------------------------------------------------------------------
-# Shared cleanup fragments (inlined into generated RUN layers)
-# ---------------------------------------------------------------------------
 APT_CLEAN='rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*'
 PIP_CLEAN='rm -rf /root/.cache/pip /tmp/*'
 NVM_SH='. /root/.nvm/nvm.sh'
-
-# Set by emit_python; used when temporarily switching for terraform-compliance.
 DEFAULT_PYTHON_VERSION=''
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-enabled() {
-  [ "${1:-}" = "true" ]
-}
 
 has_versions() {
   [ -n "${1:-}" ]
@@ -34,7 +15,6 @@ first_word() {
   echo "$1" | cut -d' ' -f1
 }
 
-# apt-get update + install --no-install-recommends + same-layer cleanup.
 apt_install() {
   cat <<EOF
 RUN apt-get update && \\
@@ -50,10 +30,6 @@ RUN pip install --no-cache-dir $* && \\
 EOF
 }
 
-# ---------------------------------------------------------------------------
-# Base image
-# ---------------------------------------------------------------------------
-
 emit_base() {
   local distro
   distro="$(awk -F'_' '{print tolower($2)}' <<<"${LINUX_VERSION}")"
@@ -63,10 +39,6 @@ FROM buildpack-deps:${distro}
 ENV DEBIAN_FRONTEND=noninteractive
 EOF
 }
-
-# ---------------------------------------------------------------------------
-# Ruby (optional)
-# ---------------------------------------------------------------------------
 
 emit_ruby() {
   has_versions "${RUBY_VERSION_NUM:-}" || return 0
@@ -89,10 +61,6 @@ RUN apt-get update && \\
     ${APT_CLEAN}
 EOF
 }
-
-# ---------------------------------------------------------------------------
-# Node + yarn + serverless (optional)
-# ---------------------------------------------------------------------------
 
 emit_node() {
   has_versions "${NODE_VERSIONS_NUM:-}" || return 0
@@ -130,51 +98,6 @@ RUN ${NVM_SH} && \\
 EOF
 }
 
-# ---------------------------------------------------------------------------
-# Java (optional; no-op on Ubuntu Focal / unlisted releases)
-# ---------------------------------------------------------------------------
-
-# Body shared by Ubuntu 14.04 and 16.04 Oracle Java branches (no leading RUN).
-oracle_java8_commands() {
-  cat <<EOF
-apt-get update && \\
-    apt-get --force-yes -y install software-properties-common && \\
-    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \\
-    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && \\
-    cd /var/tmp/ && \\
-    wget -O oracle_java8.deb debian.opennms.org/dists/opennms-23/main/binary-all/oracle-java8-installer_8u131-1~webupd8~2_all.deb && \\
-    dpkg -i oracle_java8.deb || echo "ok" && apt-get -f install -yq && \\
-    rm -f /var/tmp/oracle_java8.deb && \\
-    ${APT_CLEAN}
-EOF
-}
-
-emit_java() {
-  enabled "${JAVA:-}" || return 0
-
-  local oracle
-  oracle="$(oracle_java8_commands)"
-
-  cat <<EOF
-RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
-    echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \\
-    apt-get update && apt-get -y install -t jessie-backports openjdk-8-jdk ca-certificates-java && \\
-    ${APT_CLEAN} \\
-; elif [ \$(grep 'VERSION_ID="9"' /etc/os-release) ] ; then \\
-    apt-get update && apt-get -y -q --no-install-recommends install -t stable openjdk-8-jdk ca-certificates-java && \\
-    ${APT_CLEAN} \\
-; elif [ \$(grep 'VERSION_ID="14.04"' /etc/os-release) ] ; then \\
-    ${oracle} \\
-; elif [ \$(grep 'VERSION_ID="16.04"' /etc/os-release) ] ; then \\
-    ${oracle} \\
-; fi
-EOF
-}
-
-# ---------------------------------------------------------------------------
-# Fender toolchain
-# ---------------------------------------------------------------------------
-
 emit_fender_packages() {
   apt_install \
     zip unzip rsync parallel tar jq wget curl vim less \
@@ -201,7 +124,10 @@ EOF
   for python_version in ${PYTHON_VERSION_NUM}; do
     cat <<EOF
 RUN pyenv install ${python_version} && \\
-    rm -rf /opt/circleci/.pyenv/cache /tmp/*
+    rm -rf /opt/circleci/.pyenv/versions/${python_version}/lib/python*/test \\
+           /opt/circleci/.pyenv/versions/${python_version}/lib/python*/idle_test \\
+           /opt/circleci/.pyenv/versions/${python_version}/lib/python*/lib2to3/tests \\
+           /opt/circleci/.pyenv/cache /tmp/*
 EOF
   done
 
@@ -219,6 +145,7 @@ RUN export PYTHONIOENCODING=utf8 && \\
     pip install --no-cache-dir 'PyYAML==3.12' --ignore-installed && \\
     pip install --no-cache-dir awscli simplejson boto boto3 botocore 'cffi==1.14.5' six 'cryptography>=2.5' 'ansible==2.8.6' && \\
     pip install --no-cache-dir google_compute_engine && \\
+    find /opt/circleci/.pyenv/versions -type d -name '__pycache__' -prune -exec rm -rf {} + && \\
     ${PIP_CLEAN}
 EOF
 }
@@ -240,16 +167,26 @@ RUN export GOPATH="/root/gowork${GOVERS}" && \\
     chmod 755 ./honeymarker && \\
     mv honeymarker /usr/bin && \\
     go clean -cache -modcache && \\
-    rm -rf /root/.cache/go-build /tmp/*
+    rm -rf /usr/local/go${GOVERS}/test \\
+           /usr/local/go${GOVERS}/api \\
+           /usr/local/go${GOVERS}/doc \\
+           /usr/local/go${GOVERS}/misc \\
+           /root/.cache/go-build /tmp/*
 EOF
 }
 
 emit_terraform() {
+  local tf_spec="latest"
+  if [ -n "${TF_VERSION_REGEX:-}" ]; then
+    tf_spec="latest:${TF_VERSION_REGEX}"
+  fi
+
   cat <<EOF
 RUN git clone https://github.com/kamatama41/tfenv.git /root/.tfenv && \\
     export PATH="/root/.tfenv/bin:\$PATH" && \\
-    tfenv install latest:${TF_VERSION_REGEX:-} && \\
-    rm -rf /tmp/*
+    tfenv install ${tf_spec} && \\
+    tfenv use ${tf_spec} && \\
+    rm -rf /root/.tfenv/test /root/.tfenv/docs /tmp/*
 RUN export TFLINT_VERSION=${TFLINT_VERSION} && \\
     curl https://raw.githubusercontent.com/terraform-linters/tflint/\$TFLINT_VERSION/install_linux.sh | bash && \\
     rm -rf /tmp/*
@@ -262,86 +199,16 @@ RUN wget https://github.com/tfsec/tfsec/releases/download/${TFSEC_VERSION}/tfsec
 EOF
 }
 
-# ---------------------------------------------------------------------------
-# Optional clients / browser tooling
-# ---------------------------------------------------------------------------
-
-emit_db_clients() {
-  if enabled "${MYSQL_CLIENT:-}"; then
-    apt_install mysql-client
-  fi
-  if enabled "${POSTGRES_CLIENT:-}"; then
-    apt_install postgresql-client
-  fi
-}
-
-emit_dockerize() {
-  enabled "${DOCKERIZE:-}" || return 0
-
-  local version="v0.6.1"
-  cat <<EOF
-RUN wget https://github.com/jwilder/dockerize/releases/download/${version}/dockerize-linux-amd64-${version}.tar.gz && \\
-    tar -C /usr/local/bin -xzvf dockerize-linux-amd64-${version}.tar.gz && \\
-    rm dockerize-linux-amd64-${version}.tar.gz
-EOF
-}
-
-emit_browsers() {
-  enabled "${BROWSERS:-}" || return 0
-
-  cat <<EOF
-RUN if [ \$(grep 'VERSION_ID="8"' /etc/os-release) ] ; then \\
-    echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list && \\
-    apt-get update && apt-get -y install -t jessie-backports xvfb phantomjs && \\
-    ${APT_CLEAN} \\
-; else \\
-    apt-get update && apt-get -y --no-install-recommends install xvfb phantomjs && \\
-    ${APT_CLEAN} \\
-; fi
-ENV DISPLAY=:99
-RUN curl --silent --show-error --location --fail --retry 3 --output /tmp/firefox.deb https://s3.amazonaws.com/circle-downloads/firefox-mozilla-build_47.0.1-0ubuntu1_amd64.deb && \\
-    echo 'ef016febe5ec4eaf7d455a34579834bcde7703cb0818c80044f4d148df8473bb  /tmp/firefox.deb' | sha256sum -c && \\
-    dpkg -i /tmp/firefox.deb || apt-get -f install && \\
-    apt-get install -y --no-install-recommends libgtk3.0-cil-dev libasound2 libdbus-glib-1-2 libdbus-1-3 && \\
-    rm -rf /tmp/firefox.deb && \\
-    ${APT_CLEAN}
-RUN curl --silent --show-error --location --fail --retry 3 --output /tmp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \\
-    (dpkg -i /tmp/google-chrome-stable_current_amd64.deb || apt-get -fy install) && \\
-    rm -rf /tmp/google-chrome-stable_current_amd64.deb && \\
-    sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox --no-sandbox|g' \\
-      "/opt/google/chrome/google-chrome" && \\
-    ${APT_CLEAN}
-RUN apt-get update && \\
-    apt-get install -y --no-install-recommends libgconf-2-4 && \\
-    curl --silent --show-error --location --fail --retry 3 --output /tmp/chromedriver_linux64.zip "http://chromedriver.storage.googleapis.com/2.33/chromedriver_linux64.zip" && \\
-    cd /tmp && \\
-    unzip chromedriver_linux64.zip && \\
-    rm -rf chromedriver_linux64.zip && \\
-    mv chromedriver /usr/local/bin/chromedriver && \\
-    chmod +x /usr/local/bin/chromedriver && \\
-    ${APT_CLEAN}
-EOF
-}
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-
 main() {
   emit_base
   emit_ruby
   emit_node
-  emit_java
 
   emit_fender_packages
   emit_python
   emit_ansible
   emit_golang
   emit_terraform
-
-  emit_db_clients
-  emit_dockerize
-  emit_browsers
 }
 
 main
