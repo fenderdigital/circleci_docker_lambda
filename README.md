@@ -1,50 +1,35 @@
-# CircleCI Dockerfile Wizard
+# circleci_docker_lambda
 
-Easily build Docker images with different versions/combinations of common languages/dependencies, for use on CircleCI.
+Builds and publishes the shared Docker image used by Fender/Presonus Lambda CI pipelines:
 
-## Prerequisites
+`opsfender/circleci:lambda_<branch>`
 
-- [CircleCI account](https://circleci.com/signup)
-- [Docker Hub account](https://hub.docker.com) (Docker itself **does not** need to be installed on your computer)
-- [Make](https://en.wikipedia.org/wiki/Make_(software)) & [Perl](https://perl.org) (included in most macOS & Linux installations)
+Consumers typically use `opsfender/circleci:lambda_main`.
 
-## Usage
+## What’s in the image
 
-**1. Fork this repository and start building it on CircleCI:**
+| Tooling | Versions / notes |
+|---|---|
+| Base | `buildpack-deps` (Ubuntu Focal) |
+| Node (nvm) | `20.12.1` (default), `24.14.1` + yarn + serverless@3.39.0 |
+| Python (pyenv) | `3.6.8` (default), `3.7.2`, `3.8.5`, `3.12.10`, `3.14.3` |
+| Go | `1.26.1` (+ cover, goveralls, honeymarker) |
+| Terraform | tfenv (`latest` stable), tflint, tfsec, terraform-compliance |
+| Other | awscli, ansible, boto/boto3, zip/rsync/parallel/jq, etc. |
 
-![Setup Project](https://raw.githubusercontent.com/CircleCI-Public/dockerfile-wizard/master/img/setup%20project.jpg "Setup Project")
+Versions are configured in `.circleci/config.yml` under `image_config`.
 
-**2. Add your Docker Hub username (`DOCKER_USERNAME`) and password (`DOCKER_PASSWORD`) to CircleCI, either as project-specific environment variables (shown below), or as resources in your **org-global** (default) [Context](https://circleci.com/docs/2.0/contexts)**
+## How it works
 
-![Environment Variables](https://raw.githubusercontent.com/CircleCI-Public/dockerfile-wizard/master/img/env%20vars.jpg "Environment Variables")
+1. Edit `image_config` in `.circleci/config.yml` (Node/Python/Go/tf versions, etc.).
+2. Push to GitHub; CircleCI runs the `build` job.
+3. `scripts/generate.sh` emits a `Dockerfile` from those env vars.
+4. The image is built and pushed to Docker Hub as `$DOCKERHUB_USERNAME/circleci:lambda_$CIRCLE_BRANCH`.
+5. The generated `Dockerfile` is stored as a build artifact.
 
-**3.** Clone your fork of the project onto your computer
+Docker Hub credentials come from the CircleCI **Global** context (`DOCKERHUB_USERNAME`, `DOCKERHUB_PASSWORD`).
 
-**4.** Enter the cloned `dockerfile-wizard` directory and run `make ready` to prepare the `config.yml` file for building Docker images on CircleCI
+## Local notes
 
-**5.** Run `make setup` in the cloned directory, or else manually add the versions/dependencies that you need to `.circleci/config.yml` as specified in the [`image_config` section](https://github.com/CircleCI-Public/dockerfile-wizard/blob/master/.circleci/config.yml)
-
-**6.** Commit and push your changes
-
-Once the build has finished, your image will be available at `http://hub.docker.com/r/DOCKER_USERNAME/IMAGE_NAME` and can be used in other projects building on CircleCI (or anywhere else!). The Dockerfile for your image will be stored as an artifact in this project's `build` job.
-
-To use the Dockerfile Wizard again, run `make reset` in the cloned directory, then repeat steps **4-6**.
-
-### How it works
-
-1. The `setup` script adds your requested version information to the config.yml file as environment variables
-1. The `generate.sh` script runs on CircleCI and generates a Dockerfile based on those environment variables
-1. CircleCI builds your Docker image from the generated Dockerfile, deploys it using your Docker credentials, and then tests your image using [Bats](https://github.com/sstephenson/bats), which we install in every Docker image built via this repository
-
-### Notes
-
-- The portions of this repository that run on your local computer are intended for Linux/macOS operating systems; they may not work on Windows
-- This repository has not been tested with every possible permutation of versions/dependencies, and you may encounter errors with some combinations of various languages/tools. If your `build` job fails, check its `docker build` step—there's likely a compilation error with a particular version of Ruby, Node, or Python.
-- Thanks to [jmason](https://github.com/jmason/tap-to-junit-xml) for the `tap-to-junit` script!
-- [Feedback/questions/bugs welcome!](https://github.com/CircleCI-Public/dockerfile-wizard/issues)
-- Want to do all this yourself? Check out our video on [creating custom Docker images for CircleCI](https://youtube.com/watch?v=JYVLeguIbe0)
-
-### To-do
-
-- Add PHP support
-- Add support for other container registries
+- `scripts/setup.sh` / `make setup` are leftover interactive wizard helpers; prefer editing `.circleci/config.yml` directly.
+- Image builds run on CircleCI (`machine` executor); you do not need Docker Hub push access locally to change versions.

@@ -6,8 +6,6 @@ image_config: &image_config
 
   LINUX_VERSION: UBUNTU_FOCAL
 
-  # RUBY_VERSION_NUM:
-
   # Default node version is the first value in the string below:
   NODE_VERSIONS_NUM: "20.12.1 24.14.1"
 

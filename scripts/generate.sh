@@ -40,28 +40,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 EOF
 }
 
-emit_ruby() {
-  has_versions "${RUBY_VERSION_NUM:-}" || return 0
-
-  local series
-  series="$(awk -F'.' '{print $1"."$2}' <<<"${RUBY_VERSION_NUM}")"
-
-  cat <<EOF
-RUN apt-get update && \\
-    apt-get install -y --no-install-recommends libssl-dev && \\
-    wget http://ftp.ruby-lang.org/pub/ruby/${series}/ruby-${RUBY_VERSION_NUM}.tar.gz && \\
-    tar -xzf ruby-${RUBY_VERSION_NUM}.tar.gz && \\
-    cd ruby-${RUBY_VERSION_NUM}/ && \\
-    ./configure && \\
-    make -j4 && \\
-    make install && \\
-    cd / && \\
-    rm -rf ruby-${RUBY_VERSION_NUM} ruby-${RUBY_VERSION_NUM}.tar.gz && \\
-    ruby -v && \\
-    ${APT_CLEAN}
-EOF
-}
-
 emit_node() {
   has_versions "${NODE_VERSIONS_NUM:-}" || return 0
 
@@ -201,7 +179,6 @@ EOF
 
 main() {
   emit_base
-  emit_ruby
   emit_node
 
   emit_fender_packages

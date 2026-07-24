@@ -38,17 +38,6 @@ case "$LINUX_VERSION" in
 esac
 
 read -r -p "
-Pick a Ruby version from https://cache.ruby-lang.org/pub/ruby (i.e., 2.4.2, etc.), or hit enter to skip installing Ruby
-: " RUBY_VERSION_NUM
-
-if [ "$RUBY_VERSION_NUM" ] ; then
-  perl -i -pe "s/# pick a version from https:\/\/cache.ruby-lang.org\/pub\/ruby/$RUBY_VERSION_NUM/" .circleci/config.yml
-else
-  perl -i -pe "s/RUBY_VERSION_NUM:/# RUBY_VERSION_NUM:/" .circleci/config.yml
-  perl -i -pe "s/- run: ruby/# - run: ruby/" .circleci/config.yml
-fi
-
-read -r -p "
 Pick a Node version from https://nodejs.org/dist, or hit enter to skip installing Node
 : " NODE_VERSION_NUM
 
