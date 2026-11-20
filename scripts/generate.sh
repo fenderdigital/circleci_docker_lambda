@@ -177,6 +177,32 @@ RUN wget https://github.com/tfsec/tfsec/releases/download/${TFSEC_VERSION}/tfsec
 EOF
 }
 
+# The Terraform apply gate's AI reviewer venv (fenderdigital/circleci
+# terraform/plan_gate): built once here from its hash-pinned lock, so builds
+# don't install it from PyPI each time. The launcher uses it only when the
+# .complete marker matches its own requirements.lock (copy of it in
+# scripts/tf_plan_review/; keep the two in sync) and the venv's interpreter is
+# the Python 3.12 it chose; otherwise it installs its own venv as before.
+emit_tf_plan_review() {
+  local python_version
+  python_version="${TF_PLAN_REVIEW_PYTHON:-$(tr ' ' '\n' <<<"${PYTHON_VERSION_NUM}" | grep -m1 '^3\.12\.' || true)}"
+  if [ -z "${python_version}" ]; then
+    echo "emit_tf_plan_review: no Python 3.12 in PYTHON_VERSION_NUM" >&2
+    return 1
+  fi
+
+  cat <<EOF
+COPY scripts/tf_plan_review/requirements.lock /opt/tf-plan-review/requirements.lock
+RUN /opt/circleci/.pyenv/versions/${python_version}/bin/python3.12 -I -m venv /opt/tf-plan-review/venv && \\
+    /opt/tf-plan-review/venv/bin/python -I -m pip install --isolated --no-cache-dir --quiet \\
+      --require-hashes --only-binary :all: --no-deps -r /opt/tf-plan-review/requirements.lock && \\
+    printf 'lock-%s' "\$(sha256sum /opt/tf-plan-review/requirements.lock | cut -d' ' -f1)" \\
+      > /opt/tf-plan-review/venv/.complete && \\
+    chmod -R go-w /opt/tf-plan-review && \\
+    ${PIP_CLEAN}
+EOF
+}
+
 main() {
   emit_base
   emit_node
@@ -186,6 +212,7 @@ main() {
   emit_ansible
   emit_golang
   emit_terraform
+  emit_tf_plan_review
 }
 
 main

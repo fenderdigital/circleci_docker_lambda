@@ -15,6 +15,7 @@ Consumers typically use `opsfender/circleci:lambda_main`.
 | Python (pyenv) | `3.6.8` (default), `3.7.2`, `3.8.5`, `3.12.10`, `3.14.3` |
 | Go | `1.26.1` (+ cover, goveralls, honeymarker) |
 | Terraform | tfenv (`latest` stable), tflint, tfsec, terraform-compliance |
+| Terraform apply gate | AI reviewer venv at `/opt/tf-plan-review/venv` (Python `3.12.x`, from `scripts/tf_plan_review/requirements.lock`, a copy of `fenderdigital/circleci` `terraform/plan_gate/reviewer/requirements.lock`; keep them in sync) |
 | Other | awscli, ansible, boto/boto3, zip/rsync/parallel/jq, etc. |
 
 Versions are configured in `.circleci/config.yml` under `image_config`.
