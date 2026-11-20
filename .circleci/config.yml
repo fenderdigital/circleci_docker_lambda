@@ -16,7 +16,7 @@ image_config: &image_config
 
   # Terraform version baked in. Keep in sync with fenderdigital/circleci
   # terraform/install_latest.sh (every app build runs it; it then finds this
-  # version already installed).
+  # version already installed) and with the version the smoke-test job checks.
   TF_VERSION_REGEX: "^1\\.17\\.2$"
   TFSEC_VERSION: "v1.28.5"
   TFLINT_VERSION: "v0.49.0"
@@ -70,7 +70,7 @@ jobs:
             aws --version
             /opt/circleci/.pyenv/versions/3.8.5/bin/terraform-compliance --version
             export PATH="/root/.tfenv/bin:/usr/local/go$GOVERS/bin:$PATH"
-            terraform version | grep -F "Terraform v1.17.2"
+            terraform version | grep -F "Terraform v1.17.2"  # the TF_VERSION_REGEX pin
             tflint --version
             tfsec --version
             go version
