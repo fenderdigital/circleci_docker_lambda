@@ -13,6 +13,11 @@ image_config: &image_config
   PYTHON_VERSION_NUM: "3.6.8 3.7.2 3.8.5 3.12.10 3.14.3"
 
   GOVERS: "1.26.1"
+
+  # Terraform version baked in. Keep in sync with fenderdigital/circleci
+  # terraform/install_latest.sh (every app build runs it; it then finds this
+  # version already installed).
+  TF_VERSION_REGEX: "^1\\.17\\.2$"
   TFSEC_VERSION: "v1.28.5"
   TFLINT_VERSION: "v0.49.0"
 
@@ -29,15 +34,58 @@ jobs:
 
       - run: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
 
-      - run: docker build -t $DOCKERHUB_USERNAME/$IMAGE_NAME:lambda_$CIRCLE_BRANCH .
-
-      - run: docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:lambda_$CIRCLE_BRANCH && sleep 10
+      # zstd layers (level 19, every layer recompressed, OCI media types):
+      # fewer bytes to download and faster to unpack than gzip. CircleCI's
+      # container runtime and Docker 23+ pull them; smoke-test checks the pull.
+      - run:
+          name: Build and push the image with zstd layers
+          command: |
+            docker buildx create --name zstd-builder --driver docker-container --use
+            docker buildx build --platform linux/amd64 \
+              --output "type=image,name=$DOCKERHUB_USERNAME/$IMAGE_NAME:lambda_$CIRCLE_BRANCH,push=true,compression=zstd,compression-level=19,force-compression=true,oci-mediatypes=true" \
+              .
+            sleep 10
 
       - store_artifacts:
           path: Dockerfile
+
+  # Runs on the image just pushed, as app builds do: proves CircleCI can pull it
+  # (the spin-up step shows the pull time) and that the tools are there.
+  smoke-test:
+    docker:
+      - image: opsfender/circleci:lambda_<< pipeline.git.branch >>
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+    environment: *image_config
+    steps:
+      - run:
+          name: Check the image's tools
+          command: |
+            set -eux
+            for v in $PYTHON_VERSION_NUM; do
+              /opt/circleci/.pyenv/versions/$v/bin/python -c "import ssl, sqlite3, readline, bz2, lzma, zlib, ctypes, curses, uuid, dbm.gnu"
+            done
+            python3 --version
+            aws --version
+            /opt/circleci/.pyenv/versions/3.8.5/bin/terraform-compliance --version
+            export PATH="/root/.tfenv/bin:/usr/local/go$GOVERS/bin:$PATH"
+            terraform version | grep -F "Terraform v1.17.2"
+            tflint --version
+            tfsec --version
+            go version
+            . /root/.nvm/nvm.sh
+            for v in $NODE_VERSIONS_NUM; do nvm exec "$v" node --version; done
+            /opt/tf-plan-review/venv/bin/python -c "import strands, boto3"
+            cat /opt/tf-plan-review/venv/.complete
+            gcc --version | head -1
 
 workflows:
   dockerfile_wizard:
     jobs:
       - build:
           context: Global
+      - smoke-test:
+          context: Global
+          requires:
+            - build
