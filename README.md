@@ -26,8 +26,8 @@ Versions are configured in `.circleci/config.yml` under `image_config`.
 2. Push to GitHub; CircleCI runs the `build` job.
 3. `scripts/generate.sh` emits a `Dockerfile` from those env vars.
 4. The image is built with `docker buildx` and pushed to Docker Hub as `$DOCKERHUB_USERNAME/circleci:lambda_$CIRCLE_BRANCH`, with zstd-compressed layers (smaller and faster to unpack than gzip; needs Docker 23+ to pull).
-4a. The `smoke-test` job then runs on the pushed image, as app builds do, and checks its tools. Its "Spin up environment" step shows how long the pull took.
 5. The generated `Dockerfile` is stored as a build artifact.
+6. The `smoke-test` job then runs on the pushed image, as app builds do, and checks its tools. Its "Spin up environment" step shows how long the pull took.
 
 Docker Hub credentials come from the CircleCI **Global** context (`DOCKERHUB_USERNAME`, `DOCKERHUB_PASSWORD`).
 
